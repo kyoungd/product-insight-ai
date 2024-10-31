@@ -1,0 +1,192 @@
+/* File Name: css/product-insight-style.css */
+
+/* Main chatbox container */
+#product-insight-aichatbox {
+  max-width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  padding: 5px;
+  border-radius: 8px;
+}
+
+/* Input container */
+#product-insight-aichatbox #product-insight-aiinput {
+  display: flex;
+  padding: 10px;
+  background-color: transparent;
+}
+
+/* User input field */
+#product-insight-aichatbox #product-insight-aiuser-input {
+  flex-grow: 1;
+  background-color: inherit;
+  color: inherit;
+  border: 1px solid;
+  border-radius: 4px;
+  padding: 10px;
+}
+
+#product-insight-aichatbox #product-insight-aiuser-input::placeholder {
+  color: inherit;
+  opacity: 0.7; /* Slightly dim the placeholder text */
+}
+
+#product-insight-aichatbox #product-insight-aiuser-input:focus {
+  outline: none;
+  border-color: currentColor;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1); /* Adjust based on theme */
+}
+
+#product-insight-aichatbox #product-insight-aiuser-input:disabled {
+  background-color: inherit;
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Last reply container */
+#product-insight-aichatbox #product-insight-ailast-reply-container {
+  padding: 15px;
+  min-height: 100px;
+  overflow-y: auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+/* Loading indicator */
+#product-insight-aichatbox #product-insight-ailoading {
+  font-style: italic;
+  color: inherit;
+  text-align: center;
+  margin-top: 10px;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 768px) {
+  #product-insight-aichatbox {
+      padding: 5px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  #product-insight-aichatbox #product-insight-aiuser-input {
+      margin-bottom: 0;
+  }
+  #product-insight-aichatbox #product-insight-ailast-reply-container {
+      padding: 10px;
+  }
+}
+
+
+/* Main chatbox container */
+#product-insight-aichatbox {
+  max-width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  padding: 5px;
+  border-radius: 8px;
+}
+
+/* Input container */
+#product-insight-aichatbox #product-insight-aiinput {
+  display: flex;
+  padding: 10px;
+  background-color: transparent;
+}
+
+/* User input field */
+#product-insight-aichatbox #product-insight-aiuser-input {
+  flex-grow: 1;
+  background-color: inherit;
+  color: inherit;
+  border: 1px solid;
+  border-radius: 4px;
+  padding: 10px;
+}
+
+#product-insight-aichatbox #product-insight-aiuser-input::placeholder {
+  color: inherit;
+  opacity: 0.7; /* Slightly dim the placeholder text */
+}
+
+#product-insight-aichatbox #product-insight-aiuser-input:focus {
+  outline: none;
+  border-color: currentColor;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1); /* Adjust based on theme */
+}
+
+#product-insight-aichatbox #product-insight-aiuser-input:disabled {
+  background-color: inherit;
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Last reply container */
+#product-insight-aichatbox #product-insight-ailast-reply-container {
+  padding: 15px;
+  min-height: 100px;
+  overflow-y: auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+/* Loading indicator */
+#product-insight-aichatbox #product-insight-ailoading {
+  font-style: italic;
+  color: inherit;
+  text-align: center;
+  margin-top: 10px;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 768px) {
+  #product-insight-aichatbox {
+    padding: 5px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  #product-insight-aichatbox #product-insight-aiuser-input {
+    margin-bottom: 0;
+  }
+  #product-insight-aichatbox #product-insight-ailast-reply-container {
+    padding: 10px;
+  }
+}
+
+/* --- Added Styles Below --- */
+
+/* Input wrapper styles */
+.h2-input-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+/* Error indicator styles */
+.h2-error-indicator {
+  display: none;
+  position: absolute;
+  right: -20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  background-color: #dc3232;
+  border-radius: 50%;
+}
+
+/* Show error indicator when there's an error */
+.h2-input-wrapper.has-error .h2-error-indicator {
+  display: block;
+}
+
+/* Additional error message styling */
+.h2-wrap .settings-error {
+  border-left: 4px solid #dc3232;
+  padding: 12px;
+  background-color: #fff8f8;
+  margin: 15px 0;
+}
