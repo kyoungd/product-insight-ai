@@ -25,6 +25,7 @@ jQuery(document).ready(function($) {
         inputContainer.html('<input type="text" id="product-insight-aiuser-input" placeholder="Ask about the product...">');
         userInput = $('#product-insight-aiuser-input'); // Reassign the userInput variable
         attachInputListeners(); // Reattach event listeners
+        userInput.focus(); // Add this line to maintain focus
     }
 
     function makeInitialCall() {
