@@ -3,7 +3,7 @@
  * Plugin Name: H2 Product Insight
  * Plugin URI: https://example.com/h2-product-insight
  * Description: AI-powered Product Insight for WooCommerce
- * Version: 1.1
+ * Version: 1.2
  * Author: Your Name
  * Author URI: https://example.com
  * Text Domain: h2-product-insight
@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
 
-define('H2_PRODUCT_INSIGHT_VERSION', '1.1.1');
+define('H2_PRODUCT_INSIGHT_VERSION', '1.2.1');
 
 // Check if WooCommerce is active
 if (!in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_option('active_plugins')))) {

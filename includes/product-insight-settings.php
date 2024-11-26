@@ -33,7 +33,7 @@ class H2_Product_Insight_Settings {
         wp_enqueue_script('jquery');
 
         // Enqueue the custom admin script
-        wp_enqueue_script('h2_product_insight_admin_js', plugins_url('../js/activation.js', __FILE__), array('jquery'), '1.1', true );
+        wp_enqueue_script('h2_product_insight_admin_js', plugins_url('../js/activation.js', __FILE__), array('jquery'), '1.2', true );
 
         // Localize script to pass AJAX URL and nonce
         wp_localize_script('h2_product_insight_admin_js', 'h2_product_insight', array(

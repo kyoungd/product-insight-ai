@@ -69,13 +69,13 @@ class H2_Product_Insight {
             'product-insight-style',
             plugin_dir_url(__FILE__) . '../css/product-insight-style.css',
             array(),
-            '1.1'  // Changed from '1.0' to '1.1'
+            '1.2'  // Changed from '1.0' to '1.2'
         );
         wp_enqueue_script(
             'h2-product-insight-script',
             plugin_dir_url(__FILE__) . '../js/h2-product-insight-script.js',
             array('jquery'),
-            '1.1',  // Changed from '1.0' to '1.1'
+            '1.2',  // Changed from '1.0' to '1.2'
             true
         );
         wp_localize_script('h2-product-insight-script', 'h2_product_insight_ajax', array(
