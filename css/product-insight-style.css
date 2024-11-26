@@ -161,3 +161,22 @@
     margin: 8px 0;
   }
 }
+
+
+#h2_activation_message {
+  margin-top: 10px;
+  padding: 10px 15px;
+  border-radius: 4px;
+}
+
+#h2_activation_message.updated {
+  background-color: #dff0d8;
+  border: 1px solid #d6e9c6;
+  color: #3c763d;
+}
+
+#h2_activation_message.error {
+  background-color: #f2dede;
+  border: 1px solid #ebccd1;
+  color: #a94442;
+}

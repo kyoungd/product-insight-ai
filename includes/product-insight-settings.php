@@ -285,7 +285,7 @@ class H2_Product_Insight_Settings {
         $value = isset($this->options['api_key']) ? $this->options['api_key'] : '';
         $error_class = in_array('api_key', $this->invalid_fields) ? 'has-error' : '';
         echo '<div class="h2-input-wrapper ' . $error_class . '">';
-        echo '<input type="password" id="api_key" name="h2_product_insight_options[api_key]" value="' . esc_attr($value) . '" class="regular-text">';
+        echo '<input type="text" id="api_key" name="h2_product_insight_options[api_key]" value="' . esc_attr($value) . '" class="regular-text">';
         echo '<span class="h2-error-indicator"></span>';
         echo '</div>';
     }
@@ -397,89 +397,86 @@ class H2_Product_Insight_Settings {
         echo '<p class="description">' . esc_html__('Enter any custom CSS to style the chatbox.', 'h2') . '</p>';
     }
 
+
+
+
     /**
      * Handles the activation of Product Insight AI via AJAX.
      */
     public function handle_activate_product_insight() {
-        // Check nonce for security
         check_ajax_referer('h2_activate_product_insight_nonce', 'nonce');
+        error_log('H2 Product Insight: Starting activation process');
 
-        // Ensure the user has the required capability
         if (!current_user_can('manage_options')) {
-            wp_send_json_error(array('message' => __('You do not have permission to perform this action.', 'h2')));
+            wp_send_json_error(array('message' => __('Permission denied.', 'h2')));
+            return;
         }
 
-        // Prepare the API URL
         $call_url = H2_PRODUCT_INSIGHT_API_URL;
-        // Validate API Key
         $registration_url = preg_replace('#/query$#', '/new-registration', $call_url);
         if ($registration_url === $call_url) {
             $registration_url = rtrim($call_url, '/') . '/new-registration';
         }
-        if (empty($registration_url)) {
-            wp_send_json_error(array('message' => __('API URL is not defined.', 'h2')));
-        }
 
-        // $registration_url = trailingslashit($activation_url) . 'new-registration';
-
-        // Prepare the request body
-        $body = wp_json_encode(array('api_key' => ''));
-
-        // Send the POST request to /new-registration
         $response = wp_remote_post($registration_url, array(
             'headers' => array('Content-Type' => 'application/json'),
-            'body'    => $body,
+            'body'    => wp_json_encode(array('api_key' => '')),
             'timeout' => 15,
         ));
 
         if (is_wp_error($response)) {
-            wp_send_json_error(array('message' => sprintf(__('API request failed: %s', 'h2'), $response->get_error_message())));
+            wp_send_json_error(array('message' => $response->get_error_message()));
+            return;
         }
 
         $response_code = wp_remote_retrieve_response_code($response);
         $response_body = wp_remote_retrieve_body($response);
         $result = json_decode($response_body, true);
 
+        error_log('H2 Product Insight: API Response: ' . $response_body);
+
         if ($response_code !== 200 || empty($result['api_key'])) {
             $error_message = isset($result['message']) ? $result['message'] : __('API activation failed.', 'h2');
             wp_send_json_error(array('message' => $error_message));
+            return;
         }
 
-        // // Update the settings with the new API key
-        // $options = get_option('h2_product_insight_options', array());
-        // $options['api_key'] = sanitize_text_field($result['api_key']);
-        // update_option('h2_product_insight_options', $options);
+        // Create options array directly (bypass sanitize for initial activation)
+        $options = array(
+            'api_key' => sanitize_text_field($result['api_key']),
+            'custom_template' => '',
+            'custom_css' => '',
+            'chatbox_placement' => 'after_add_to_cart'
+        );
 
-        // wp_send_json_success(array('message' => __('Product Insight AI activated successfully!', 'h2')));
+        error_log('H2 Product Insight: Options to save: ' . print_r($options, true));
 
-        // Update the settings with the new API key
-        $options = get_option('h2_product_insight_options', array());
-
-        if (!is_array($options)) {
-            error_log('H2 Product Insight: $options is not an array. Initializing as empty array.');
-            $options = array();
+        // Delete existing option first
+        delete_option('h2_product_insight_options');
+        
+        // Add new option
+        $update_success = add_option('h2_product_insight_options', $options);
+        
+        if (!$update_success) {
+            // If add_option failed, try update_option
+            $update_success = update_option('h2_product_insight_options', $options, false);
         }
 
-        $options['api_key'] = sanitize_text_field($result['api_key']);
+        error_log('H2 Product Insight: Update success: ' . ($update_success ? 'true' : 'false'));
 
-        // Optionally, ensure other keys are present
-        $required_keys = array('api_url', 'custom_template', 'custom_css', 'chatbox_placement');
-        foreach ($required_keys as $key) {
-            if (!isset($options[$key])) {
-                // Set default values or handle accordingly
-                $options[$key] = ($key === 'chatbox_placement') ? 'after_add_to_cart' : '';
-            }
-        }
+        // Verify the saved data
+        $saved_options = get_option('h2_product_insight_options');
+        error_log('H2 Product Insight: Saved options: ' . print_r($saved_options, true));
 
-        $update_success = update_option('h2_product_insight_options', $options);
-
-        if ($update_success) {
-            error_log('H2 Product Insight: Successfully updated h2_product_insight_options with new API key.');
-            wp_send_json_success(array('message' => __('Product Insight AI activated successfully!', 'h2')));
+        if ($saved_options && isset($saved_options['api_key']) && !empty($saved_options['api_key'])) {
+            wp_send_json_success(array(
+                'message' => __('Product Insight AI activated successfully!', 'h2'),
+                'api_key' => $saved_options['api_key']
+            ));
         } else {
-            error_log('H2 Product Insight: Failed to update h2_product_insight_options.');
-            wp_send_json_error(array('message' => __('Failed to update settings. Please try again.', 'h2')));
+            wp_send_json_error(array('message' => __('Failed to save API key.', 'h2')));
         }
+    }    
 
-    }
+
 }
