@@ -1,8 +1,9 @@
 jQuery(document).ready(function($) {
-    // Check if we're on a product page
-    if (!$('body').hasClass('single-product')) {
-        return;
-    }
+    // // Check if we're on a product page
+    // if (!$('body').hasClass('single-product')) {
+    //     console.log('skip - no single product.')
+    //     return;
+    // }
 
     const lastReplyContainer = $('#product-insight-ailast-reply-container');
     const inputContainer = $('#product-insight-aiinput');

@@ -33,7 +33,7 @@ class H2_Product_Insight_Settings {
         wp_enqueue_script('jquery');
 
         // Enqueue the custom admin script
-        wp_enqueue_script('h2_product_insight_admin_js', plugins_url('../js/activation.js', __FILE__), array('jquery'), '1.0', true );
+        wp_enqueue_script('h2_product_insight_admin_js', plugins_url('../js/activation.js', __FILE__), array('jquery'), '1.1', true );
 
         // Localize script to pass AJAX URL and nonce
         wp_localize_script('h2_product_insight_admin_js', 'h2_product_insight', array(
@@ -80,6 +80,15 @@ class H2_Product_Insight_Settings {
             'h2_product_insight_settings'
         );
 
+        // Add API URL field back
+        add_settings_field(
+            'api_url',
+            __('API URL', 'h2'),
+            array($this, 'render_api_url_field'),
+            'h2_product_insight_settings',
+            'h2_product_insight_general_section'
+        );
+
         // API Key field
         add_settings_field(
             'api_key',
@@ -117,6 +126,17 @@ class H2_Product_Insight_Settings {
         );
     }
 
+    // Add the render method for API URL field
+    public function render_api_url_field() {
+        $value = isset($this->options['api_url']) ? $this->options['api_url'] : H2_PRODUCT_INSIGHT_API_URL;
+        $error_class = in_array('api_url', $this->invalid_fields) ? 'has-error' : '';
+        echo '<div class="h2-input-wrapper ' . $error_class . '">';
+        echo '<input type="text" id="api_url" name="h2_product_insight_options[api_url]" value="' . esc_attr($value) . '" class="regular-text">';
+        echo '<span class="h2-error-indicator"></span>';
+        echo '</div>';
+        echo '<p class="description">' . esc_html__('The API endpoint URL', 'h2') . '</p>';
+    }
+
     /**
      * Sanitizes and validates settings input
      * 
@@ -141,6 +161,15 @@ class H2_Product_Insight_Settings {
                 'error'
             );
             $sanitized_input['api_key'] = isset($existing_options['api_key']) ? $existing_options['api_key'] : '';
+        }
+
+        // Sanitize API URL
+        if (isset($input['api_url']) && !empty($input['api_url'])) {
+            $sanitized_input['api_url'] = esc_url_raw($input['api_url']);
+        } else {
+            $sanitized_input['api_url'] = isset($existing_options['api_url']) 
+                ? $existing_options['api_url'] 
+                : H2_PRODUCT_INSIGHT_API_URL;
         }
 
         // If any required fields are missing, retain existing values and stop validation

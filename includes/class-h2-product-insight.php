@@ -16,6 +16,7 @@ class H2_Product_Insight {
 
     private $settings;
     private $api_key;
+    private $product_id; // Add this line to store product ID
 
     public function __construct() {
         // Settings class initialization
@@ -33,14 +34,33 @@ class H2_Product_Insight {
 
         // Theme integration
         new H2_Product_Insight_Theme_Integration();
+
+        // Add shortcode registration
+        add_shortcode('h2_product_insight', array($this, 'handle_shortcode'));
+
+        // Remove the script enqueuing from the init method
+        // add_action('wp_enqueue_scripts', array($this, 'enqueue_scripts'));
+    }
+
+    // Add this new method to handle shortcode
+    public function handle_shortcode($atts) {
+        $attributes = shortcode_atts(array(
+            'product_id' => 0
+        ), $atts);
+
+        $this->product_id = intval($attributes['product_id']);
+
+        // Enqueue scripts now that product_id is set
+        $this->enqueue_scripts();
+
+        return $this->render_chatbox();
     }
 
     public function init() {
         $options = get_option('h2_product_insight_options');
         $this->api_key = isset($options['api_key']) ? $options['api_key'] : '';
 
-        // Enqueue scripts
-        add_action('wp_enqueue_scripts', array($this, 'enqueue_scripts'));
+        // Scripts will be enqueued when rendering the chatbox
     }
 
     public function enqueue_scripts() {
@@ -49,20 +69,20 @@ class H2_Product_Insight {
             'product-insight-style',
             plugin_dir_url(__FILE__) . '../css/product-insight-style.css',
             array(),
-            '1.0'
+            '1.1'  // Changed from '1.0' to '1.1'
         );
         wp_enqueue_script(
             'h2-product-insight-script',
             plugin_dir_url(__FILE__) . '../js/h2-product-insight-script.js',
             array('jquery'),
-            '1.0',
+            '1.1',  // Changed from '1.0' to '1.1'
             true
         );
         wp_localize_script('h2-product-insight-script', 'h2_product_insight_ajax', array(
             'ajax_url'   => admin_url('admin-ajax.php'),
             'nonce'      => wp_create_nonce('h2_product_insight_nonce'),
             'api_key'    => $this->api_key,
-            'product_id' => get_the_ID()
+            'product_id' => $this->product_id ?: get_the_ID() // Modified to use stored product_id
         ));
     }
 
@@ -94,7 +114,11 @@ class H2_Product_Insight {
     }
 
     public function display_chatbox() {
-        if (is_product()) {
+        // Modified to work for both WooCommerce and shortcode
+        if (is_product() || $this->product_id) {
+            $this->product_id = get_the_ID();
+            // Enqueue scripts now that product_id is set
+            $this->enqueue_scripts();
             echo $this->render_chatbox();
         }
     }
@@ -109,7 +133,11 @@ class H2_Product_Insight {
     }
 
     public function render_chatbox() {
-        // Render the chatbox using the renderer class
+        // Ensure product_id is set
+        if (!$this->product_id && is_product()) {
+            $this->product_id = get_the_ID();
+        }
+        // Scripts are already enqueued in the previous methods
         return H2_Product_Insight_Renderer::render();
     }
 
