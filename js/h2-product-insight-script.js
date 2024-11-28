@@ -1,3 +1,13 @@
+/**
+ * H2 Product Insight - Product Insight AI for WooCommerce
+ *
+ * @package    H2_Product_Insight
+ * @autor      Young Kwon
+ * @copyright  Copyright (C) 2024, Young Kwon
+ * @license    GPL-2.0-or-later
+ * @link       https://2human.ai
+ */
+
 jQuery(document).ready(function($) {
     // // Check if we're on a product page
     // if (!$('body').hasClass('single-product')) {

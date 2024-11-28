@@ -1,0 +1,44 @@
+
+name: Tests
+
+on: [push, pull_request]
+
+jobs:
+  phpunit:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: [7.4, 8.0]
+        wordpress: [5.8, latest]
+        
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php }}
+        
+    - name: Install dependencies
+      run: composer install
+        
+    - name: Run PHPUnit
+      run: vendor/bin/phpunit
+
+  cypress:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+        
+    - name: Install dependencies
+      run: npm install
+        
+    - name: Run Cypress
+      uses: cypress-io/github-action@v2
+      with:
+        start: npm run test:e2e

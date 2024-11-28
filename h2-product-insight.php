@@ -1,11 +1,13 @@
 <?php
 /**
  * Plugin Name: H2 Product Insight
- * Plugin URI: https://example.com/h2-product-insight
+ * Plugin URI: https://2human.ai/wp-content/uploads/2024/11/h2-product-insight.zip
  * Description: AI-powered Product Insight for WooCommerce
  * Version: 1.2
- * Author: Your Name
- * Author URI: https://example.com
+ * Author: Young Kwon
+ * Author URI: https://2human.ai
+ * License: GPL-2.0-or-later                  // Added license information
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: h2-product-insight
  * Requires at least: 5.0
  * Requires PHP: 7.2

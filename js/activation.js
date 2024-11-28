@@ -1,3 +1,13 @@
+/**
+ * H2 Product Insight - Admin Activation Script
+ *
+ * @package    H2_Product_Insight
+ * @author     Young Kwon
+ * @copyright  Copyright (C) 2024, Young Kwon
+ * @license    GPL-2.0-or-later
+ * @link       https://2human.ai
+ */
+
 jQuery(document).ready(function($) {
     $('#h2_activate_button').on('click', function(e) {
         e.preventDefault();
