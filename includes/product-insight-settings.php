@@ -32,8 +32,13 @@ class H2_Product_Insight_Settings {
         }
         wp_enqueue_script('jquery');
 
-        // Enqueue the custom admin script
-        wp_enqueue_script('h2_product_insight_admin_js', plugins_url('../js/activation.js', __FILE__), array('jquery'), '1.2', true );
+        // Update version number to use constant
+        wp_enqueue_script('h2_product_insight_admin_js', 
+            plugins_url('../js/activation.js', __FILE__), 
+            array('jquery'), 
+            H2_PRODUCT_INSIGHT_VERSION, 
+            true 
+        );
 
         // Localize script to pass AJAX URL and nonce
         wp_localize_script('h2_product_insight_admin_js', 'h2_product_insight', array(
@@ -80,15 +85,6 @@ class H2_Product_Insight_Settings {
             'h2_product_insight_settings'
         );
 
-        // Add API URL field back
-        add_settings_field(
-            'api_url',
-            __('API URL', 'h2'),
-            array($this, 'render_api_url_field'),
-            'h2_product_insight_settings',
-            'h2_product_insight_general_section'
-        );
-
         // API Key field
         add_settings_field(
             'api_key',
@@ -107,15 +103,6 @@ class H2_Product_Insight_Settings {
             'h2_product_insight_general_section'
         );
 
-        // Custom Template field
-        add_settings_field(
-            'custom_template',
-            __('Custom Template', 'h2'),
-            array($this, 'render_custom_template_field'),
-            'h2_product_insight_settings',
-            'h2_product_insight_general_section'
-        );
-
         // Custom CSS field
         add_settings_field(
             'custom_css',
@@ -126,28 +113,10 @@ class H2_Product_Insight_Settings {
         );
     }
 
-    // Add the render method for API URL field
-    public function render_api_url_field() {
-        $value = isset($this->options['api_url']) ? $this->options['api_url'] : H2_PRODUCT_INSIGHT_API_URL;
-        $error_class = in_array('api_url', $this->invalid_fields) ? 'has-error' : '';
-        echo '<div class="h2-input-wrapper ' . $error_class . '">';
-        echo '<input type="text" id="api_url" name="h2_product_insight_options[api_url]" value="' . esc_attr($value) . '" class="regular-text">';
-        echo '<span class="h2-error-indicator"></span>';
-        echo '</div>';
-        echo '<p class="description">' . esc_html__('The API endpoint URL', 'h2') . '</p>';
-    }
-
-    /**
-     * Sanitizes and validates settings input
-     * 
-     * @param array $input The raw input from the settings form
-     * @return array Sanitized input, reverting to previous values if validation fails
-     */
     public function sanitize($input) {
         $sanitized_input = array();
         $this->invalid_fields = array(); 
         $existing_options = get_option('h2_product_insight_options', array());
-
 
         // Sanitize API Key
         if (isset($input['api_key']) && !empty($input['api_key'])) {
@@ -163,29 +132,14 @@ class H2_Product_Insight_Settings {
             $sanitized_input['api_key'] = isset($existing_options['api_key']) ? $existing_options['api_key'] : '';
         }
 
-        // Sanitize API URL
-        if (isset($input['api_url']) && !empty($input['api_url'])) {
-            $sanitized_input['api_url'] = esc_url_raw($input['api_url']);
-        } else {
-            $sanitized_input['api_url'] = isset($existing_options['api_url']) 
-                ? $existing_options['api_url'] 
-                : H2_PRODUCT_INSIGHT_API_URL;
-        }
-
         // If any required fields are missing, retain existing values and stop validation
         if (!empty($this->invalid_fields)) {
             update_option('h2_product_insight_invalid_fields', $this->invalid_fields);
             return array_merge($existing_options, $sanitized_input);
         }
 
-        $call_url = H2_PRODUCT_INSIGHT_API_URL;
-        // Validate API Key
-        $validate_api_url = preg_replace('#/query$#', '/validate-api-key', $call_url);
-        if ($validate_api_url === $call_url) {
-            $validate_api_url = rtrim($call_url, '/') . '/validate-api-key';
-        }
-
-        $response = wp_remote_post($validate_api_url, array(
+        // Use direct concatenation for API endpoints
+        $response = wp_remote_post(H2_PRODUCT_INSIGHT_API_URL . '/validate-api-key', array(
             'headers' => array('Content-Type' => 'application/json'),
             'body'    => wp_json_encode(array('api_key' => $sanitized_input['api_key'])),
             'timeout' => 15,
@@ -234,15 +188,6 @@ class H2_Product_Insight_Settings {
         }
 
         // Sanitize optional fields
-        
-        // Sanitize custom template
-        if (isset($input['custom_template'])) {
-            $sanitized_input['custom_template'] = wp_kses_post($input['custom_template']);
-        } else {
-            $sanitized_input['custom_template'] = isset($existing_options['custom_template']) 
-                ? $existing_options['custom_template'] 
-                : '';
-        }
 
         // Sanitize custom CSS
         if (isset($input['custom_css'])) {
@@ -377,45 +322,6 @@ class H2_Product_Insight_Settings {
         
         echo '<p class="description">' . __('Select where to display the chatbox on product pages', 'h2') . '</p>';
     }
-    
-    /**
-     * Renders the Custom Template field with placeholder documentation and live preview.
-     */
-    public function render_custom_template_field() {
-        $value = isset($this->options['custom_template']) ? $this->options['custom_template'] : '';
-        echo '<textarea id="custom_template" name="h2_product_insight_options[custom_template]" rows="10" cols="50" class="large-text code">' . esc_textarea($value) . '</textarea>';
-        echo '<p class="description">' . esc_html__('Enter your custom HTML template here. Use the placeholders listed below.', 'h2') . '</p>';
-        echo '<p class="description">' . esc_html__('Available placeholders:', 'h2') . '</p>';
-        echo '<ul>';
-        echo '<li><code>{input_field}</code> - ' . esc_html__('The input field for user queries.', 'h2') . '</li>';
-        echo '<li><code>{loading_indicator}</code> - ' . esc_html__('The loading indicator element.', 'h2') . '</li>';
-        echo '<li><code>{last_reply}</code> - ' . esc_html__('Container for the last AI reply.', 'h2') . '</li>';
-        echo '</ul>';
-        echo '<h3>' . esc_html__('Live Preview:', 'h2') . '</h3>';
-        echo '<div id="custom_template_preview" style="border: 1px solid #ccc; padding: 10px; margin-top: 10px;"></div>';
-        echo '
-        <script>
-        (function($){
-            function updatePreview() {
-                var template = $("#custom_template").val();
-                var placeholders = {
-                    "{input_field}": "<input type=\'text\' placeholder=\'I am Edward, your AI. Ask me anything...\' />",
-                    "{loading_indicator}": "<div>Initializing...</div>",
-                    "{last_reply}": "<div>Last reply will appear here.</div>",
-                };
-                for (var key in placeholders) {
-                    template = template.replace(new RegExp(key, "g"), placeholders[key]);
-                }
-                $("#custom_template_preview").html(template);
-            }
-            $(document).ready(function(){
-                $("#custom_template").on("input", updatePreview);
-                updatePreview(); // Initial call
-            });
-        })(jQuery);
-        </script>
-        ';
-    }
 
     /**
      * Renders the Custom CSS field.
@@ -441,13 +347,7 @@ class H2_Product_Insight_Settings {
             return;
         }
 
-        $call_url = H2_PRODUCT_INSIGHT_API_URL;
-        $registration_url = preg_replace('#/query$#', '/new-registration', $call_url);
-        if ($registration_url === $call_url) {
-            $registration_url = rtrim($call_url, '/') . '/new-registration';
-        }
-
-        $response = wp_remote_post($registration_url, array(
+        $response = wp_remote_post(H2_PRODUCT_INSIGHT_API_URL . '/new-registration', array(
             'headers' => array('Content-Type' => 'application/json'),
             'body'    => wp_json_encode(array('api_key' => '')),
             'timeout' => 15,

@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
 
-define('H2_PRODUCT_INSIGHT_VERSION', '1.2.1');
+require_once plugin_dir_path(__FILE__) . 'includes/constants.php';
 
 // Check if WooCommerce is active
 if (!in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_option('active_plugins')))) {
@@ -32,13 +32,6 @@ function h2_product_insight_init() {
     new H2_Product_Insight();
 }
 add_action('plugins_loaded', 'h2_product_insight_init');
-
-// Enqueue scripts and styles
-function h2_product_insight_enqueue_scripts() {
-    wp_enqueue_style('product-insight-style', plugin_dir_url(__FILE__) . 'css/product-insight-style.css', array(), H2_PRODUCT_INSIGHT_VERSION);
-    wp_enqueue_script('h2-product-insight-script', plugin_dir_url(__FILE__) . 'js/h2-product-insight-script.js', array('jquery'), H2_PRODUCT_INSIGHT_VERSION, true);
-}
-add_action('wp_enqueue_scripts', 'h2_product_insight_enqueue_scripts');
 
 // Add a "Settings" link to the plugin action links
 add_filter('plugin_action_links_' . plugin_basename(__FILE__), 'h2_product_insight_plugin_action_links');
