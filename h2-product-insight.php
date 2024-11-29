@@ -3,7 +3,7 @@
  * Plugin Name: H2 Product Insight
  * Plugin URI: https://2human.ai/wp-content/uploads/2024/11/h2-product-insight.zip
  * Description: AI-powered Product Insight for WooCommerce
- * Version: 1.2
+ * Version: 1.3
  * Author: Young Kwon
  * Author URI: https://2human.ai
  * License: GPL-2.0-or-later                  // Added license information
