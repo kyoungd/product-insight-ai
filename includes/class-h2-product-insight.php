@@ -18,6 +18,13 @@ require_once plugin_dir_path(__FILE__) . './constants.php';
 require_once plugin_dir_path(__FILE__) . './product-insight-settings.php';
 require_once plugin_dir_path(__FILE__) . './product-insight-renderer.php';
 
+/**
+ * Main plugin class
+ *
+ * @package    H2_Product_Insight
+ * @subpackage Classes
+ * @since      1.0.0
+ */
 class H2_Product_Insight {
 
     private $settings;
@@ -148,11 +155,11 @@ class H2_Product_Insight {
         check_ajax_referer('h2_product_insight_nonce', 'nonce');
 
         // Use the domain passed from JavaScript
-        $caller_domain = isset($_POST['caller_domain']) ? sanitize_text_field($_POST['caller_domain']) : '';
+        $caller_domain = isset($_POST['caller_domain']) ? sanitize_text_field(wp_unslash($_POST['caller_domain'])) : '';
 
         $initial_data = array(
-            'subscription_external_id' => sanitize_text_field($_POST['subscription_external_id']),
-            'timeZone'                 => sanitize_text_field($_POST['timeZone']),
+            'subscription_external_id' => sanitize_text_field(wp_unslash($_POST['subscription_external_id'])),
+            'timeZone'                 => sanitize_text_field(wp_unslash($_POST['timeZone'])),
             'caller'                   => new stdClass(),
             'caller_domain'            => $caller_domain
         );
@@ -219,7 +226,7 @@ class H2_Product_Insight {
             return new WP_Error('api_error', 'API Key is not set. Please configure the plugin settings.');
         }
 
-        $body = json_encode($initial_data);
+        $body = wp_json_encode($initial_data);
 
         return wp_remote_post(H2_PRODUCT_INSIGHT_API_URL . '/query', array(
             'headers' => array(

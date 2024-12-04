@@ -1,5 +1,15 @@
 <?php
-// File: includes/product-insight-settings.php
+/**
+ * Settings for H2 Product Insight
+ *
+ * @package    H2_Product_Insight
+ * @author     Young Kwon
+ * @copyright  Copyright (C) 2024, Young Kwon
+ * @license    GPL-2.0-or-later
+ * @link       https://2human.ai
+ */
+
+ // File: includes/product-insight-settings.php
 
 if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
@@ -339,7 +349,7 @@ class H2_Product_Insight_Settings {
      * Handles the activation of Product Insight AI via AJAX.
      */
     public function handle_activate_product_insight() {
-        check_ajax_referer('h2_activate_product_insight_nonce', 'nonce');
+        check_ajax_referer('h2_activate_product_insight_nonce', 'h2_activate_product_insight_nonce_field');
         error_log('H2 Product Insight: Starting activation process');
 
         if (!current_user_can('manage_options')) {

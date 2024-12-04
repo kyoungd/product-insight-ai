@@ -1,18 +1,22 @@
 <?php
 /**
  * Plugin Name: H2 Product Insight
- * Plugin URI: https://2human.ai/wp-content/uploads/2024/11/h2-product-insight.zip
- * Description: AI-powered Product Insight for WooCommerce
+ * Plugin URI: https://2human.ai/product-insight
+ * Description: AI-powered Product Insight for WooCommerce products. Adds an intelligent chatbot that helps customers understand your products better.
  * Version: 1.3
- * Author: Young Kwon
- * Author URI: https://2human.ai
- * License: GPL-2.0-or-later                  // Added license information
- * License URI: https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain: h2-product-insight
  * Requires at least: 5.0
  * Requires PHP: 7.2
+ * Author: Young Kwon
+ * Author URI: https://2human.ai
+ * License: GPL v2 or later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
+ * Text Domain: h2-product-insight
+ * Domain Path: /languages
  * WC requires at least: 3.0
  * WC tested up to: 6.0
+ * Update URI: https://2human.ai/product-insight/update
+ *
+ * @package H2_Product_Insight
  */
 
 if (!defined('ABSPATH')) {
@@ -31,6 +35,7 @@ require_once plugin_dir_path(__FILE__) . 'includes/class-h2-product-insight.php'
 
 // Initialize the plugin
 function h2_product_insight_init() {
+    load_plugin_textdomain('h2-product-insight', false, dirname(plugin_basename(__FILE__)) . '/languages/');
     new H2_Product_Insight();
 }
 add_action('plugins_loaded', 'h2_product_insight_init');
@@ -40,6 +45,5 @@ add_filter('plugin_action_links_' . plugin_basename(__FILE__), 'h2_product_insig
 
 function h2_product_insight_plugin_action_links($links) {
     $settings_link = '<a href="' . admin_url('options-general.php?page=h2_product_insight') . '">' . __('Settings', 'h2-product-insight') . '</a>';
-    array_unshift($links, $settings_link);
-    return $links;
+    array_unshift($links, $settings_link);    return $links;
 }
