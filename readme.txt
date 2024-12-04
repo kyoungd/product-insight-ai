@@ -1,7 +1,7 @@
 === H2 Product Insight ===
 Contributors: young kwon
 Donate link: 
-Tags: woocommerce, ai, product, chat, artificial intelligence
+Tags: woocommerce, ai, product, chat, artificial intelligence, product insight, product question answer
 Requires at least: 5.0
 Tested up to: 6.4
 Stable tag: 1.3
