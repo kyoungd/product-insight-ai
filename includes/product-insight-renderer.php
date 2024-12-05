@@ -55,8 +55,8 @@ class H2_Product_Insight_Renderer {
         ?>
         <div id="product-insight-aichatbox">
             <div id="product-insight-aiinput">
-                <input type="text" id="product-insight-aiuser-input" placeholder="<?php echo esc_attr__('I am Edward, your AI. Ask me anything...', 'h2'); ?>" aria-label="<?php echo esc_attr__('Chat Input', 'h2'); ?>">
-                <div id="product-insight-ailoading" style="display: none;"><?php echo esc_html__('Initializing...', 'h2'); ?></div>
+                <input type="text" id="product-insight-aiuser-input" placeholder="<?php echo esc_attr__('Ask about the product...','h2-product-insight'); ?>" aria-label="<?php echo esc_attr__('Chat Input','h2-product-insight'); ?>">
+                <div id="product-insight-ailoading" style="display: none;"><?php echo esc_html__('Initializing...','h2-product-insight'); ?></div>
             </div>
             <div id="product-insight-ailast-reply-container" style="display: none;"></div>
             <div id="product-insight-aimessages"></div>

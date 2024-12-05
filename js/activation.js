@@ -25,7 +25,7 @@ jQuery(document).ready(function($) {
             type: 'POST',
             data: {
                 action: 'h2_activate_product_insight',
-                nonce: h2_product_insight.nonce
+                nonce: h2_product_insight.nonce  // This should match what we verify in PHP
             },
             success: function(response) {
                 if (response.success) {
