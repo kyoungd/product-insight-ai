@@ -129,7 +129,7 @@ class H2_Product_Insight {
             $this->product_id = get_the_ID();
             // Enqueue scripts now that product_id is set
             $this->enqueue_scripts();
-            echo $this->render_chatbox();
+            echo esc_html($this->render_chatbox());
         }
     }
 
