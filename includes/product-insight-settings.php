@@ -162,6 +162,7 @@ class H2_Product_Insight_Settings {
                 'h2_product_insight_settings',
                 'api_request_failed',
                 sprintf(
+                    /* translators: %s is the error message returned by the API. */
                     __('API validation request failed: %s. Previous values retained.','h2-product-insight'),
                     $response->get_error_message()
                 ),
@@ -269,11 +270,23 @@ class H2_Product_Insight_Settings {
     public function render_api_key_field() {
         $value = isset($this->options['api_key']) ? $this->options['api_key'] : '';
         $error_class = in_array('api_key', $this->invalid_fields) ? 'has-error' : '';
-        echo '<div class="h2-input-wrapper ' . $error_class . '">';
-        echo '<input type="text" id="api_key" name="h2_product_insight_options[api_key]" value="' . esc_attr($value) . '" class="regular-text">';
+        
+        // Use printf to output the div with escaped class attribute
+        printf(
+            '<div class="h2-input-wrapper %s">',
+            esc_attr($error_class)
+        );
+        
+        // Use printf to output the input field with escaped attributes
+        printf(
+            '<input type="text" id="api_key" name="h2_product_insight_options[api_key]" value="%s" class="regular-text">',
+            esc_attr($value)
+        );
+        
         echo '<span class="h2-error-indicator"></span>';
         echo '</div>';
     }
+    
     
     /**
      * Renders the Chatbox Placement field.
@@ -283,55 +296,60 @@ class H2_Product_Insight_Settings {
         
         $options = array(
             // Before product
-            'before_single_product' => __('Before Single Product','h2-product-insight'),
+            'before_single_product' => esc_html__('Before Single Product','h2-product-insight'),
             
             // Title area
-            'before_title' => __('Before Product Title','h2-product-insight'),
-            'after_title' => __('After Product Title','h2-product-insight'),
+            'before_title' => esc_html__('Before Product Title','h2-product-insight'),
+            'after_title' => esc_html__('After Product Title','h2-product-insight'),
             
             // Price area
-            'before_price' => __('Before Price','h2-product-insight'),
-            'after_price' => __('After Price','h2-product-insight'),
+            'before_price' => esc_html__('Before Price','h2-product-insight'),
+            'after_price' => esc_html__('After Price','h2-product-insight'),
             
             // Short description area
-            'before_excerpt' => __('Before Short Description','h2-product-insight'),
-            'after_excerpt' => __('After Short Description','h2-product-insight'),
+            'before_excerpt' => esc_html__('Before Short Description','h2-product-insight'),
+            'after_excerpt' => esc_html__('After Short Description','h2-product-insight'),
             
             // Add to cart area
-            'before_add_to_cart' => __('Before Add to Cart Button','h2-product-insight'),
-            'after_add_to_cart' => __('After Add to Cart Button','h2-product-insight'),
+            'before_add_to_cart' => esc_html__('Before Add to Cart Button','h2-product-insight'),
+            'after_add_to_cart' => esc_html__('After Add to Cart Button','h2-product-insight'),
             
             // Product meta
-            'before_product_meta' => __('Before Product Meta','h2-product-insight'),
-            'after_product_meta' => __('After Product Meta','h2-product-insight'),
+            'before_product_meta' => esc_html__('Before Product Meta','h2-product-insight'),
+            'after_product_meta' => esc_html__('After Product Meta','h2-product-insight'),
             
             // Product summary
-            'before_product_summary' => __('Before Product Summary','h2-product-insight'),
-            'after_product_summary' => __('After Product Summary','h2-product-insight'),
+            'before_product_summary' => esc_html__('Before Product Summary','h2-product-insight'),
+            'after_product_summary' => esc_html__('After Product Summary','h2-product-insight'),
             
             // Tabs area
-            'before_tabs' => __('Before Tabs','h2-product-insight'),
-            'in_product_tabs' => __('In Product Tabs','h2-product-insight'),
-            'after_tabs' => __('After Tabs','h2-product-insight'),
+            'before_tabs' => esc_html__('Before Tabs','h2-product-insight'),
+            'in_product_tabs' => esc_html__('In Product Tabs','h2-product-insight'),
+            'after_tabs' => esc_html__('After Tabs','h2-product-insight'),
             
             // Related products
-            'before_related_products' => __('Before Related Products','h2-product-insight'),
-            'after_related_products' => __('After Related Products','h2-product-insight'),
+            'before_related_products' => esc_html__('Before Related Products','h2-product-insight'),
+            'after_related_products' => esc_html__('After Related Products','h2-product-insight'),
             
             // End of product
-            'after_single_product' => __('After Single Product','h2-product-insight'),
+            'after_single_product' => esc_html__('After Single Product','h2-product-insight'),
             
             // Sidebar options
-            'product_sidebar' => __('In Product Sidebar','h2-product-insight')
+            'product_sidebar' => esc_html__('In Product Sidebar','h2-product-insight')
         );
         
         echo '<select id="chatbox_placement" name="h2_product_insight_options[chatbox_placement]">';
         foreach ($options as $key => $label) {
-            echo '<option value="' . esc_attr($key) . '" ' . selected($value, $key, false) . '>' . esc_html($label) . '</option>';
+            printf(
+                '<option value="%s" %s>%s</option>',
+                esc_attr($key),
+                selected($value, $key, false),
+                esc_html($label)
+            );
         }
         echo '</select>';
         
-        echo '<p class="description">' . __('Select where to display the chatbox on product pages','h2-product-insight') . '</p>';
+        echo '<p class="description">' . esc_html__('Select where to display the chatbox on product pages','h2-product-insight') . '</p>';
     }
 
     /**
@@ -339,7 +357,10 @@ class H2_Product_Insight_Settings {
      */
     public function render_custom_css_field() {
         $value = isset($this->options['custom_css']) ? $this->options['custom_css'] : '';
-        echo '<textarea id="custom_css" name="h2_product_insight_options[custom_css]" rows="10" cols="50" class="large-text code">' . esc_textarea($value) . '</textarea>';
+        printf(
+            '<textarea id="custom_css" name="h2_product_insight_options[custom_css]" rows="10" cols="50" class="large-text code">%s</textarea>',
+            esc_textarea($value)
+        );
         echo '<p class="description">' . esc_html__('Enter any custom CSS to style the chatbox.','h2-product-insight') . '</p>';
     }
 
@@ -356,7 +377,7 @@ class H2_Product_Insight_Settings {
         error_log('H2 Product Insight: Starting activation process');
 
         if (!current_user_can('manage_options')) {
-            wp_send_json_error(array('message' => __('Permission denied.','h2-product-insight')));
+            wp_send_json_error(array('message' => esc_html__('Permission denied.','h2-product-insight')));
             return;
         }
 
@@ -378,7 +399,7 @@ class H2_Product_Insight_Settings {
         error_log('H2 Product Insight: API Response: ' . $response_body);
 
         if ($response_code !== 200 || empty($result['api_key'])) {
-            $error_message = isset($result['message']) ? $result['message'] : __('API activation failed.','h2-product-insight');
+            $error_message = isset($result['message']) ? $result['message'] : esc_html__('API activation failed.','h2-product-insight');
             wp_send_json_error(array('message' => $error_message));
             return;
         }
@@ -412,11 +433,11 @@ class H2_Product_Insight_Settings {
 
         if ($saved_options && isset($saved_options['api_key']) && !empty($saved_options['api_key'])) {
             wp_send_json_success(array(
-                'message' => __('Product Insight AI activated successfully!','h2-product-insight'),
+                'message' => esc_html__('Product Insight AI activated successfully!','h2-product-insight'),
                 'api_key' => $saved_options['api_key']
             ));
         } else {
-            wp_send_json_error(array('message' => __('Failed to save API key.','h2-product-insight')));
+            wp_send_json_error(array('message' => esc_html__('Failed to save API key.','h2-product-insight')));
         }
     }    
 
