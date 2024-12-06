@@ -4,7 +4,7 @@ Donate link:
 Tags: artificial intelligence, product insight, product question answer
 Requires at least: 5.0
 Tested up to: 6.7
-Stable tag: 1.3
+Stable tag: 1.4
 Requires PHP: 7.2
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -54,6 +54,12 @@ By default, it appears after the Add to Cart button, but you can customize its p
 3. Customization options.
 
 == Changelog ==
+
+= 1.4 =
+* Updted the code to pass the submission to wordpress ==
+* Properly escaping all text for input/output
+* Remove debug messages
+* Make sure all input/output variables before using
 
 = 1.3 =
 * Added custom CSS support.

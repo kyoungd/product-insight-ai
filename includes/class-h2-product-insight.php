@@ -129,7 +129,7 @@ class H2_Product_Insight {
             $this->product_id = get_the_ID();
             // Enqueue scripts now that product_id is set
             $this->enqueue_scripts();
-            echo esc_html($this->render_chatbox());
+            echo wp_kses_post($this->render_chatbox());
         }
     }
 
@@ -148,31 +148,38 @@ class H2_Product_Insight {
             $this->product_id = get_the_ID();
         }
         // Scripts are already enqueued in the previous methods
-        return H2_Product_Insight_Renderer::render();
+        $html = H2_Product_Insight_Renderer::render();
+        return wp_kses_post($html);
     }
 
     public function handle_initial_call() {
         check_ajax_referer('h2_product_insight_nonce', 'nonce');
+
+        // Validate and sanitize all POST data
+        if (!isset($_POST['subscription_external_id'], $_POST['timeZone'])) {
+            wp_send_json_error('Required fields are missing');
+            return;
+        }
 
         // Use the domain passed from JavaScript
         $caller_domain = isset($_POST['caller_domain']) ? sanitize_text_field(wp_unslash($_POST['caller_domain'])) : '';
 
         $initial_data = array(
             'subscription_external_id' => sanitize_text_field(wp_unslash($_POST['subscription_external_id'])),
-            'timeZone'                 => sanitize_text_field(wp_unslash($_POST['timeZone'])),
-            'caller'                   => new stdClass(),
-            'caller_domain'            => $caller_domain
+            'timeZone'                => sanitize_text_field(wp_unslash($_POST['timeZone'])),
+            'caller'                  => new stdClass(),
+            'caller_domain'           => $caller_domain
         );
 
-        // Get the product ID from the AJAX request
+        // Validate and sanitize product ID
         $product_id = isset($_POST['product_id']) ? intval($_POST['product_id']) : 0;
 
         $product_description = '';
-        $product_title       = '';
+        $product_title = '';
         if ($product_id) {
             $product = wc_get_product($product_id);
             if ($product) {
-                $product_title       = $this->get_product_title($product);
+                $product_title = $this->get_product_title($product);
                 $product_description = $this->get_product_full_description($product);
             }
         }
@@ -183,15 +190,15 @@ class H2_Product_Insight {
             wp_send_json_error($response->get_error_message());
             return;
         }
-    
+
         $ai_response = json_decode($response['body'], false);
-    
+
         if (!$ai_response || !isset($ai_response->success) || $ai_response->success !== true) {
             $error_message = isset($ai_response->message) ? $ai_response->message : 'Unknown error occurred';
             wp_send_json_error($error_message);
             return;
         }
-    
+
         $ai_response->data->product_title = $product_title;
         $ai_response->data->product_description = $product_description;
         wp_send_json_success($ai_response);
@@ -200,8 +207,28 @@ class H2_Product_Insight {
     public function send_product_insight_message() {
         check_ajax_referer('h2_product_insight_nonce', 'nonce');
 
-        $user_message = sanitize_text_field($_POST['message']);
-        $initial_data = isset($_POST['data']) ? $_POST['data'] : array();
+        // Validate and sanitize message
+        if (!isset($_POST['message'])) {
+            wp_send_json_error('Message is required');
+            return;
+        }
+
+        $user_message = sanitize_text_field(wp_unslash($_POST['message']));
+        
+        // Validate and sanitize data
+        $initial_data = array();
+        if (isset($_POST['data'])) {
+            // First unslash the raw input, then sanitize
+            $sanitized_data = sanitize_text_field(wp_unslash($_POST['data']));
+            // Decode the JSON
+            $raw_data = json_decode($sanitized_data, true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                $initial_data = $this->sanitize_data_array($raw_data);
+            } else {
+                wp_send_json_error('Invalid data format');
+                return;
+            }
+        }
 
         $response = $this->call_ai_api($user_message, $initial_data);
 
@@ -209,16 +236,36 @@ class H2_Product_Insight {
             wp_send_json_error($response->get_error_message());
             return;
         }
-    
+
         $ai_response = json_decode($response['body'], false);
-    
+
         if (!$ai_response || !isset($ai_response->success) || $ai_response->success !== true) {
             $error_message = isset($ai_response->message) ? $ai_response->message : 'Unknown error occurred';
             wp_send_json_error($error_message);
             return;
         }
-    
+
         wp_send_json_success($ai_response);
+    }
+
+    /**
+     * Recursively sanitize an array of data
+     *
+     * @param array|mixed $data The data to sanitize
+     * @return array|mixed
+     */
+    private function sanitize_data_array($data) {
+        if (!is_array($data)) {
+            return sanitize_text_field($data);
+        }
+
+        $sanitized_data = array();
+        foreach ($data as $key => $value) {
+            $sanitized_key = sanitize_text_field($key);
+            $sanitized_data[$sanitized_key] = $this->sanitize_data_array($value);
+        }
+
+        return $sanitized_data;
     }
 
     private function call_ai_api_initial($initial_data) {

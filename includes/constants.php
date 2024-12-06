@@ -16,6 +16,6 @@ if (!defined('ABSPATH')) {
 }
 
 define('H2_ACTIVATION_TEST', false);
-define('H2_PRODUCT_INSIGHT_VERSION', '1.3');
+define('H2_PRODUCT_INSIGHT_VERSION', '1.4');
 define('H2_PRODUCT_INSIGHT_API_URL', 'https://2human.ai/wp-json/my-first-plugin/v1');
 # define('H2_PRODUCT_INSIGHT_API_URL', 'https://talkee.ai/wp-json/my-first-plugin/v1');

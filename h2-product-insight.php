@@ -3,7 +3,7 @@
  * Plugin Name: H2 Product Insight
  * Plugin URI: https://2human.ai/product-insight/
  * Description: AI-powered Product Insight for WooCommerce products. Adds an intelligent chatbot that helps customers understand your products better.
- * Version: 1.3
+ * Version: 1.4
  * Requires at least: 5.0
  * Requires PHP: 7.2
  * Author: Young Kwon

@@ -67,7 +67,12 @@ class H2_Product_Insight_Settings {
             return;
         }
 
-        wp_enqueue_style('h2_product_insight_admin_css', plugins_url('../css/product-insight-style.css', __FILE__));
+        wp_enqueue_style(
+            'h2_product_insight_admin_css', 
+            plugins_url('../css/product-insight-style.css', __FILE__),
+            array(),
+            H2_PRODUCT_INSIGHT_VERSION
+        );        
     }
 
     /**
@@ -371,10 +376,7 @@ class H2_Product_Insight_Settings {
      * Handles the activation of Product Insight AI via AJAX.
      */
     public function handle_activate_product_insight() {
-        // Update the nonce check to match the field name from JS
         check_ajax_referer('h2_activate_product_insight_nonce', 'nonce');
-        
-        error_log('H2 Product Insight: Starting activation process');
 
         if (!current_user_can('manage_options')) {
             wp_send_json_error(array('message' => esc_html__('Permission denied.','h2-product-insight')));
@@ -396,8 +398,6 @@ class H2_Product_Insight_Settings {
         $response_body = wp_remote_retrieve_body($response);
         $result = json_decode($response_body, true);
 
-        error_log('H2 Product Insight: API Response: ' . $response_body);
-
         if ($response_code !== 200 || empty($result['api_key'])) {
             $error_message = isset($result['message']) ? $result['message'] : esc_html__('API activation failed.','h2-product-insight');
             wp_send_json_error(array('message' => $error_message));
@@ -412,8 +412,6 @@ class H2_Product_Insight_Settings {
             'chatbox_placement' => 'after_add_to_cart'
         );
 
-        error_log('H2 Product Insight: Options to save: ' . print_r($options, true));
-
         // Delete existing option first
         delete_option('h2_product_insight_options');
         
@@ -425,16 +423,10 @@ class H2_Product_Insight_Settings {
             $update_success = update_option('h2_product_insight_options', $options, false);
         }
 
-        error_log('H2 Product Insight: Update success: ' . ($update_success ? 'true' : 'false'));
-
-        // Verify the saved data
-        $saved_options = get_option('h2_product_insight_options');
-        error_log('H2 Product Insight: Saved options: ' . print_r($saved_options, true));
-
-        if ($saved_options && isset($saved_options['api_key']) && !empty($saved_options['api_key'])) {
+        if ($update_success && isset($options['api_key']) && !empty($options['api_key'])) {
             wp_send_json_success(array(
                 'message' => esc_html__('Product Insight AI activated successfully!','h2-product-insight'),
-                'api_key' => $saved_options['api_key']
+                'api_key' => $options['api_key']
             ));
         } else {
             wp_send_json_error(array('message' => esc_html__('Failed to save API key.','h2-product-insight')));
