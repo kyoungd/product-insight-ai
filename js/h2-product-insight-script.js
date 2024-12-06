@@ -29,10 +29,12 @@ jQuery(document).ready(function($) {
     }
 
     function showProgressBar() {
+        console.log('showProgressBar called');
         inputContainer.html('<div class="progress-bar"><div class="progress"></div></div>');
     }
 
     function hideProgressBar() {
+        console.log('hideProgressBar called');
         inputContainer.html('<input type="text" id="product-insight-aiuser-input" placeholder="Ask about the product...">');
         userInput = $('#product-insight-aiuser-input'); // Reassign the userInput variable
         attachInputListeners(); // Reattach event listeners
@@ -119,6 +121,7 @@ jQuery(document).ready(function($) {
     }
 
     function attachInputListeners() {
+        console.log('attachInputListeners called');
         userInput.on('keypress', function(e) {
             if (e.which === 13) {
                 sendMessage();
@@ -133,5 +136,5 @@ jQuery(document).ready(function($) {
         });
     }
 
-    attachInputListeners();
+    hideProgressBar();
 });

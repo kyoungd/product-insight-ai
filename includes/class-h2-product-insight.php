@@ -219,9 +219,7 @@ class H2_Product_Insight {
         $initial_data = array();
         if (isset($_POST['data'])) {
             // First unslash the raw input, then sanitize
-            $sanitized_data = sanitize_text_field(wp_unslash($_POST['data']));
-            // Decode the JSON
-            $raw_data = json_decode($sanitized_data, true);
+            $raw_data = wp_unslash($_POST['data']);
             if (json_last_error() === JSON_ERROR_NONE) {
                 $initial_data = $this->sanitize_data_array($raw_data);
             } else {
