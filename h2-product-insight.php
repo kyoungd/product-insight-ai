@@ -45,15 +45,12 @@ add_action('plugins_loaded', 'h2_product_insight_init');
 add_filter('plugin_action_links_' . plugin_basename(__FILE__), 'h2_product_insight_plugin_action_links');
 
 function h2_product_insight_plugin_action_links($links) {
-    $settings_url = H2_Product_Insight_Sanitizer::sanitize_url(
-        admin_url('options-general.php?page=h2_product_insight')
-    );
+    $settings_url = admin_url('options-general.php?page=h2_product_insight');
     $settings_link = sprintf(
         '<a href="%s">%s</a>',
-        esc_url($settings_url),
-        esc_html__('Settings', 'h2-product-insight')
+        H2_Product_Insight_Escaper::escape_url($settings_url),
+        H2_Product_Insight_Escaper::escape_translation('Settings')
     );
     array_unshift($links, $settings_link);
-    // Removed sanitization of the entire links array to keep HTML intact
     return $links;
 }

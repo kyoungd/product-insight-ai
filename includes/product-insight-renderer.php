@@ -17,6 +17,7 @@ if (!defined('ABSPATH')) {
 }
 
 require_once plugin_dir_path(__FILE__) . './class-h2-product-insight-sanitizer.php';
+require_once plugin_dir_path(__FILE__) . './class-h2-product-insight-escaper.php';
 
 class H2_Product_Insight_Renderer {
 
@@ -26,13 +27,11 @@ class H2_Product_Insight_Renderer {
      * @return string The rendered chatbox HTML.
      */
     public static function render() {
-        $options = H2_Product_Insight_Sanitizer::sanitize_array(
-            get_option('h2_product_insight_options', array())
-        );
+        $options = get_option('h2_product_insight_options', array());
         $custom_css = isset($options['custom_css']) ? $options['custom_css'] : '';
         
-        // Enhanced CSS sanitization
-        $custom_css = H2_Product_Insight_Sanitizer::sanitize_html($custom_css);
+        // Sanitize CSS before storing/processing
+        $custom_css = H2_Product_Insight_Sanitizer::sanitize_custom_css($custom_css);
 
         $output = '';
 
@@ -65,12 +64,14 @@ class H2_Product_Insight_Renderer {
             <div id="product-insight-aiinput">
                 <input type="text" 
                        id="product-insight-aiuser-input" 
-                       placeholder="<?php echo H2_Product_Insight_Sanitizer::sanitize_field(__('Ask about the product...','h2-product-insight')); ?>" 
-                       aria-label="<?php echo H2_Product_Insight_Sanitizer::sanitize_field(__('Chat Input','h2-product-insight')); ?>"
+                       placeholder="<?php echo H2_Product_Insight_Escaper::escape_translation('Ask about the product...'); ?>" 
+                       aria-label="<?php echo H2_Product_Insight_Escaper::escape_translation('Chat Input'); ?>"
                        maxlength="1000"
                        pattern="[^<>]*"
                 >
-                <div id="product-insight-ailoading" style="display: none;"><?php echo H2_Product_Insight_Sanitizer::sanitize_field(__('Initializing...','h2-product-insight')); ?></div>
+                <div id="product-insight-ailoading" style="display: none;">
+                    <?php echo H2_Product_Insight_Escaper::escape_translation('Initializing...'); ?>
+                </div>
             </div>
             <div id="product-insight-ailast-reply-container" style="display: none;"></div>
             <div id="product-insight-aimessages"></div>
@@ -78,4 +79,5 @@ class H2_Product_Insight_Renderer {
         <?php
         return ob_get_clean();
     }
+    
 }
