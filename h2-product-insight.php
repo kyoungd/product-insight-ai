@@ -48,7 +48,7 @@ function h2_product_insight_plugin_action_links($links) {
     $settings_url = admin_url('options-general.php?page=h2_product_insight');
     $settings_link = sprintf(
         '<a href="%s">%s</a>',
-        H2_Product_Insight_Escaper::escape_url($settings_url),
+        esc_url($settings_url),
         H2_Product_Insight_Escaper::escape_translation('Settings')
     );
     array_unshift($links, $settings_link);

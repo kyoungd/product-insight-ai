@@ -55,8 +55,8 @@ class H2_Product_Insight_Settings {
 
         // Localize script to pass AJAX URL and nonce
         wp_localize_script('h2_product_insight_admin_js', 'h2_product_insight', array(
-            'ajax_url' => H2_Product_Insight_Escaper::escape_url(admin_url('admin-ajax.php')),
-            'api_url'  => H2_Product_Insight_Escaper::escape_url(H2_PRODUCT_INSIGHT_API_URL),
+            'ajax_url' => esc_url(admin_url('admin-ajax.php')),
+            'api_url'  => esc_url(H2_PRODUCT_INSIGHT_API_URL),
             'nonce'    => wp_create_nonce('h2_activate_product_insight_nonce')
         ));
     }
@@ -246,8 +246,8 @@ class H2_Product_Insight_Settings {
         $this->options = get_option('h2_product_insight_options', array());
         ?>
         <div class="h2-wrap">
-            <h1><?php echo H2_Product_Insight_Escaper::escape_html(get_admin_page_title()); ?></h1>
-            <p><a href="<?php echo H2_Product_Insight_Escaper::escape_url('https://2human.ai/product-insight'); ?>" target="_blank"><?php echo H2_Product_Insight_Escaper::escape_translation('PRODUCT INSIGHT AI HOME'); ?></a></p>
+            <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
+            <p><a href="<?php echo esc_url('https://2human.ai/product-insight'); ?>" target="_blank"><?php echo H2_Product_Insight_Escaper::escape_translation('PRODUCT INSIGHT AI HOME'); ?></a></p>
             
             <?php if (H2_ACTIVATION_TEST || empty($this->options['api_key'])) : ?>
                 <form id="h2_activate_product_insight" method="post">
@@ -256,7 +256,7 @@ class H2_Product_Insight_Settings {
                 </form>
                 <div id="h2_activation_message"></div>
             <?php else : ?>
-                <form action="<?php echo H2_Product_Insight_Escaper::escape_url(admin_url('options.php')); ?>" method="post">
+                <form action="<?php echo esc_url(admin_url('options.php')); ?>" method="post">
                 <?php
                     settings_fields('h2_product_insight_settings');
                     do_settings_sections('h2_product_insight_settings');
@@ -287,13 +287,13 @@ class H2_Product_Insight_Settings {
         // Use printf to output the div with escaped class attribute
         printf(
             '<div class="h2-input-wrapper %s">',
-            H2_Product_Insight_Escaper::escape_attribute($error_class)
+            esc_attr($error_class)
         );
         
         // Use printf to output the input field with escaped attributes
         printf(
             '<input type="text" id="api_key" name="h2_product_insight_options[api_key]" value="%s" class="regular-text">',
-            H2_Product_Insight_Escaper::escape_attribute($value)
+            esc_attr($value)
         );
         
         echo '<span class="h2-error-indicator"></span>';
@@ -355,9 +355,9 @@ class H2_Product_Insight_Settings {
         foreach ($options as $key => $label) {
             printf(
                 '<option value="%s" %s>%s</option>',
-                H2_Product_Insight_Escaper::escape_attribute($key),
+                esc_attr($key),
                 selected($value, $key, false),
-                H2_Product_Insight_Escaper::escape_html($label)
+                esc_html($label)
             );
         }
         echo '</select>';
@@ -372,7 +372,7 @@ class H2_Product_Insight_Settings {
         $value = isset($this->options['custom_css']) ? $this->options['custom_css'] : '';
         printf(
             '<textarea id="custom_css" name="h2_product_insight_options[custom_css]" rows="10" cols="50" class="large-text code">%s</textarea>',
-            H2_Product_Insight_Escaper::escape_textarea($value)
+            esc_textarea($value)
         );
         echo '<p class="description">' . H2_Product_Insight_Escaper::escape_translation('Enter any custom CSS to style the chatbox.') . '</p>';
     }

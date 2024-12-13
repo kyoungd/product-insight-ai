@@ -92,8 +92,8 @@ class H2_Product_Insight {
             true
         );
         wp_localize_script('h2-product-insight-script', 'h2_product_insight_ajax', array(
-            'ajax_url'   => H2_Product_Insight_Escaper::escape_url(admin_url('admin-ajax.php')),
-            'api_key'    => H2_Product_Insight_Escaper::escape_attribute($this->api_key),
+            'ajax_url'   => esc_url(admin_url('admin-ajax.php')),
+            'api_key'    => esc_attr($this->api_key),
             'product_id' => absint($this->product_id ?: get_the_ID()),
             'nonce'      => wp_create_nonce('h2_product_insight_nonce') // Add this line
         ));
@@ -269,7 +269,7 @@ class H2_Product_Insight {
             return new WP_Error('api_error', H2_Product_Insight_Escaper::escape_translation('API Key is not set.'));
         }
 
-        $url = H2_Product_Insight_Escaper::escape_url(H2_PRODUCT_INSIGHT_API_URL . '/query');
+        $url = esc_url(H2_PRODUCT_INSIGHT_API_URL . '/query');
         if (empty($url)) {
             return new WP_Error('invalid_url', 'Invalid API URL');
         }
@@ -279,7 +279,7 @@ class H2_Product_Insight {
             'message' => sanitize_text_field($message, true)
         );
 
-        $response = wp_remote_post(H2_Product_Insight_Escaper::escape_url($url), array(
+        $response = wp_remote_post(esc_url($url), array(
             'headers' => array(
                 'Content-Type'  => 'application/json',
                 'Authorization' => 'Bearer ' . sanitize_text_field($this->api_key) // Changed
@@ -292,17 +292,17 @@ class H2_Product_Insight {
     }
 
     private function get_product_title($product) {
-        return H2_Product_Insight_Escaper::escape_html($product->get_name());
+        return esc_html($product->get_name());
     }
 
     private function get_product_full_description($product) {
         // Add sanitization for product descriptions
-        $short_description = H2_Product_Insight_Escaper::escape_html($product->get_short_description());
-        $description = H2_Product_Insight_Escaper::escape_html($product->get_description());
+        $short_description = esc_html($product->get_short_description());
+        $description = esc_html($product->get_description());
         $reviews = $this->get_product_reviews($product->get_id());
 
         $data1 = implode("\n", array_filter([$short_description, $description, $reviews]));
-        $data2 = H2_Product_Insight_Escaper::escape_html($data1);
+        $data2 = esc_html($data1);
         return $data2;
     }
 
@@ -318,7 +318,7 @@ class H2_Product_Insight {
         $texts   = array();
 
         foreach ($reviews as $review) {
-            $texts[] = H2_Product_Insight_Escaper::escape_html($review->comment_content);
+            $texts[] = esc_html($review->comment_content);
         }
 
         return implode("\n", $texts);
