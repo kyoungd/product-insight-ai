@@ -95,6 +95,9 @@ jQuery(document).ready(function($) {
     }
 
     function proceedWithMessage(message) {
+        // Sanitize message before sending
+        message = message.replace(/[<>]/g, '').trim().substring(0, 1000);
+        
         $.ajax({
             url: h2_product_insight_ajax.ajax_url,
             type: 'POST',

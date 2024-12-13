@@ -3,14 +3,16 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: H2 Product Insight 1.4\n"
-"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/h2-product-insight\n"
-"Last-Translator: Young Kwon\n"
-"Language-Team: 2human.ai\n"
+"POT-Creation-Date: 2024-04-27 12:00+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-12-04T18:29:09-08:00\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/h2-product-insight\n"
 "X-Generator: WP-CLI 2.11.0\n"
 "X-Domain: h2-product-insight\n"
 
@@ -213,4 +215,72 @@ msgstr ""
 
 #: includes/product-insight-settings.php:416
 msgid "Failed to save API key."
+msgstr ""
+
+#: includes/product-insight-settings.php:...
+msgid "API Key is required."
+msgstr ""
+
+#: includes/product-insight-settings.php:...
+msgid "Invalid API Key provided."
+msgstr ""
+
+#: includes/product-insight-settings.php:...
+msgid "API Key validated successfully."
+msgstr ""
+
+#: includes/class-h2-product-insight.php:...
+msgid "Unauthorized user"
+msgstr ""
+
+#: includes/class-h2-product-insight.php:...
+msgid "API URL is invalid"
+msgstr ""
+
+#: includes/class-h2-product-insight.php:...
+msgid "Failed to activate API Key"
+msgstr ""
+
+#: includes/class-h2-product-insight.php:...
+msgid "Failed to save API Key"
+msgstr ""
+
+#: includes/class-h2-product-insight.php:...
+msgid "API Key activated successfully."
+msgstr ""
+
+#: includes/class-h2-product-insight.php:...
+msgid "Send Product Insight Message"
+msgstr ""
+
+#: includes/class-h2-product-insight.php:...
+msgid "Failed to send message."
+msgstr ""
+
+#: includes/class-h2-product-insight.php:...
+msgid "Unknown error occurred"
+msgstr ""
+
+#: includes/h2-product-insight.php:...
+msgid "Settings"
+msgstr ""
+
+#: includes/h2-product-insight.php:...
+msgid "Settings"
+msgstr ""
+
+#: includes/product-insight-renderer.php:...
+msgid "Ask your question here..."
+msgstr ""
+
+#: includes/product-insight-renderer.php:...
+msgid "Send"
+msgstr ""
+
+#: includes/product-insight-renderer.php:...
+msgid "Loading..."
+msgstr ""
+
+#: includes/product-insight-renderer.php:...
+msgid "End of Conversation"
 msgstr ""

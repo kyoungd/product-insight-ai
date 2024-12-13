@@ -15,6 +15,8 @@ if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
 
+require_once plugin_dir_path(__FILE__) . './class-h2-product-insight-sanitizer.php';
+
 class H2_Product_Insight_Renderer {
 
     /**
@@ -23,14 +25,19 @@ class H2_Product_Insight_Renderer {
      * @return string The rendered chatbox HTML.
      */
     public static function render() {
-        $options = get_option('h2_product_insight_options');
+        $options = H2_Product_Insight_Sanitizer::sanitize_array(
+            get_option('h2_product_insight_options', array())
+        );
         $custom_css = isset($options['custom_css']) ? $options['custom_css'] : '';
+        
+        // Enhanced CSS sanitization
+        $custom_css = H2_Product_Insight_Sanitizer::sanitize_html($custom_css);
 
         $output = '';
 
         // Include custom CSS if provided
         if (!empty($custom_css)) {
-            $output .= '<style>' . wp_strip_all_tags($custom_css) . '</style>';
+            $output .= '<style>' . $custom_css . '</style>';
         }
 
         $output .= self::render_default_template();
@@ -55,8 +62,14 @@ class H2_Product_Insight_Renderer {
         ?>
         <div id="product-insight-aichatbox">
             <div id="product-insight-aiinput">
-                <input type="text" id="product-insight-aiuser-input" placeholder="<?php echo esc_attr__('Ask about the product...','h2-product-insight'); ?>" aria-label="<?php echo esc_attr__('Chat Input','h2-product-insight'); ?>">
-                <div id="product-insight-ailoading" style="display: none;"><?php echo esc_html__('Initializing...','h2-product-insight'); ?></div>
+                <input type="text" 
+                       id="product-insight-aiuser-input" 
+                       placeholder="<?php echo H2_Product_Insight_Sanitizer::sanitize_field(__('Ask about the product...','h2-product-insight')); ?>" 
+                       aria-label="<?php echo H2_Product_Insight_Sanitizer::sanitize_field(__('Chat Input','h2-product-insight')); ?>"
+                       maxlength="1000"
+                       pattern="[^<>]*"
+                >
+                <div id="product-insight-ailoading" style="display: none;"><?php echo H2_Product_Insight_Sanitizer::sanitize_field(__('Initializing...','h2-product-insight')); ?></div>
             </div>
             <div id="product-insight-ailast-reply-container" style="display: none;"></div>
             <div id="product-insight-aimessages"></div>

@@ -16,6 +16,7 @@ if (!defined('ABSPATH')) {
 }
 
 require_once plugin_dir_path(__FILE__) . './constants.php';
+require_once plugin_dir_path(__FILE__) . './class-h2-product-insight-sanitizer.php';
 
 class H2_Product_Insight_Settings {
     private $options;
@@ -52,9 +53,9 @@ class H2_Product_Insight_Settings {
 
         // Localize script to pass AJAX URL and nonce
         wp_localize_script('h2_product_insight_admin_js', 'h2_product_insight', array(
-            'ajax_url' => admin_url('admin-ajax.php'),
-            'api_url'  => H2_PRODUCT_INSIGHT_API_URL, // Add this line
-            'nonce'    => wp_create_nonce('h2_activate_product_insight_nonce')
+            'ajax_url' => H2_Product_Insight_Sanitizer::sanitize_url(admin_url('admin-ajax.php')),
+            'api_url'  => H2_Product_Insight_Sanitizer::sanitize_url(H2_PRODUCT_INSIGHT_API_URL),
+            'nonce'    => H2_Product_Insight_Sanitizer::sanitize_field(wp_create_nonce('h2_activate_product_insight_nonce'))
         ));
     }
 
@@ -80,11 +81,11 @@ class H2_Product_Insight_Settings {
      */
     public function add_admin_menu() {
         add_options_page(
-            __('H2 Product Insight Settings','h2-product-insight'),
-            __('H2 AI','h2-product-insight'),
-            'manage_options',
-            'h2_product_insight',
-            array($this, 'render_settings_page')
+            __('H2 Product Insight Settings', 'h2-product-insight'), // Page title
+            __('H2 Product Insight', 'h2-product-insight'),         // Menu title
+            'manage_options',                                       // Capability
+            'h2_product_insight',                                   // Menu slug
+            array($this, 'render_settings_page')                   // Callback function
         );
     }
 
@@ -130,13 +131,17 @@ class H2_Product_Insight_Settings {
     }
 
     public function sanitize($input) {
+        if (!is_array($input)) {
+            return array();
+        }
+
         $sanitized_input = array();
         $this->invalid_fields = array(); 
         $existing_options = get_option('h2_product_insight_options', array());
 
         // Sanitize API Key
         if (isset($input['api_key']) && !empty($input['api_key'])) {
-            $sanitized_input['api_key'] = sanitize_text_field($input['api_key']);
+            $sanitized_input['api_key'] = H2_Product_Insight_Sanitizer::sanitize_field($input['api_key']);
         } else {
             $this->invalid_fields[] = 'api_key';
             add_settings_error(
@@ -183,8 +188,8 @@ class H2_Product_Insight_Settings {
             if ($response_code !== 200 || empty($result['success'])) {
                 $this->invalid_fields = array_merge($this->invalid_fields, array('api_key'));
                 $message = !empty($result['message']) 
-                    ? $result['message'] 
-                    : __('API validation failed. Previous values retained.','h2-product-insight');
+                ? H2_Product_Insight_Sanitizer::sanitize_field($result['message'])
+                : H2_Product_Insight_Sanitizer::sanitize_field(__('API validation failed. Previous values retained.','h2-product-insight'));            
                 add_settings_error(
                     'h2_product_insight_settings',
                     'api_validation_failed',
@@ -208,7 +213,7 @@ class H2_Product_Insight_Settings {
 
         // Sanitize custom CSS
         if (isset($input['custom_css'])) {
-            $sanitized_input['custom_css'] = wp_strip_all_tags($input['custom_css']);
+            $sanitized_input['custom_css'] = H2_Product_Insight_Sanitizer::sanitize_html($input['custom_css']);
         } else {
             $sanitized_input['custom_css'] = isset($existing_options['custom_css']) 
                 ? $existing_options['custom_css'] 
@@ -217,7 +222,7 @@ class H2_Product_Insight_Settings {
 
         // Sanitize Chatbox Placement
         if (isset($input['chatbox_placement'])) {
-            $sanitized_input['chatbox_placement'] = sanitize_text_field($input['chatbox_placement']);
+            $sanitized_input['chatbox_placement'] = H2_Product_Insight_Sanitizer::sanitize_field($input['chatbox_placement']);
         } else {
             $sanitized_input['chatbox_placement'] = isset($existing_options['chatbox_placement']) 
                 ? $existing_options['chatbox_placement'] 
@@ -235,11 +240,12 @@ class H2_Product_Insight_Settings {
      * Renders the settings page.
      */
     public function render_settings_page() {
-        $this->options = get_option('h2_product_insight_options');
+        // Missing default value for get_option
+        $this->options = get_option('h2_product_insight_options', array());
         ?>
         <div class="h2-wrap">
             <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
-            <p><a href="https://2human.ai/product-insight" target="_blank"><?php esc_html_e('PRODUCT INSIGHT AI HOME','h2-product-insight'); ?></a></p>
+            <p><a href="<?php echo esc_url('https://2human.ai/product-insight'); ?>" target="_blank"><?php esc_html_e('PRODUCT INSIGHT AI HOME','h2-product-insight'); ?></a></p>
             
             <?php if (H2_ACTIVATION_TEST || empty($this->options['api_key'])) : ?>
                 <form id="h2_activate_product_insight" method="post">
@@ -248,7 +254,7 @@ class H2_Product_Insight_Settings {
                 </form>
                 <div id="h2_activation_message"></div>
             <?php else : ?>
-                <form action="options.php" method="post">
+                <form action="<?php echo esc_url(admin_url('options.php')); ?>" method="post">
                 <?php
                     settings_fields('h2_product_insight_settings');
                     do_settings_sections('h2_product_insight_settings');
@@ -273,7 +279,7 @@ class H2_Product_Insight_Settings {
     }
 
     public function render_api_key_field() {
-        $value = isset($this->options['api_key']) ? $this->options['api_key'] : '';
+        $value = isset($this->options['api_key']) ? H2_Product_Insight_Sanitizer::sanitize_field($this->options['api_key']) : '';
         $error_class = in_array('api_key', $this->invalid_fields) ? 'has-error' : '';
         
         // Use printf to output the div with escaped class attribute
@@ -285,7 +291,7 @@ class H2_Product_Insight_Settings {
         // Use printf to output the input field with escaped attributes
         printf(
             '<input type="text" id="api_key" name="h2_product_insight_options[api_key]" value="%s" class="regular-text">',
-            esc_attr($value)
+            H2_Product_Insight_Sanitizer::sanitize_field($value)
         );
         
         echo '<span class="h2-error-indicator"></span>';
@@ -383,7 +389,13 @@ class H2_Product_Insight_Settings {
             return;
         }
 
-        $response = wp_remote_post(H2_PRODUCT_INSIGHT_API_URL . '/new-registration', array(
+        $api_url = H2_Product_Insight_Sanitizer::sanitize_url(H2_PRODUCT_INSIGHT_API_URL . '/new-registration');
+        if (empty($api_url)) {
+            wp_send_json_error(array('message' => esc_html__('Invalid API URL.', 'h2-product-insight')));
+            return;
+        }
+
+        $response = wp_remote_post($api_url, array(
             'headers' => array('Content-Type' => 'application/json'),
             'body'    => wp_json_encode(array('api_key' => '')),
             'timeout' => 15,
@@ -406,7 +418,7 @@ class H2_Product_Insight_Settings {
 
         // Create options array directly (bypass sanitize for initial activation)
         $options = array(
-            'api_key' => sanitize_text_field($result['api_key']),
+            'api_key' => H2_Product_Insight_Sanitizer::sanitize_field($result['api_key']),
             'custom_template' => '',
             'custom_css' => '',
             'chatbox_placement' => 'after_add_to_cart'

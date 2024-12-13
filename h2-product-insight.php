@@ -31,6 +31,7 @@ if (!in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
 
 // Include the main plugin class
 require_once plugin_dir_path(__FILE__) . 'includes/class-h2-product-insight.php';
+require_once plugin_dir_path(__FILE__) . 'includes/class-h2-product-insight-sanitizer.php';
 
 // Initialize the plugin
 function h2_product_insight_init() {
@@ -43,6 +44,15 @@ add_action('plugins_loaded', 'h2_product_insight_init');
 add_filter('plugin_action_links_' . plugin_basename(__FILE__), 'h2_product_insight_plugin_action_links');
 
 function h2_product_insight_plugin_action_links($links) {
-    $settings_link = '<a href="' . admin_url('options-general.php?page=h2_product_insight') . '">' . __('Settings', 'h2-product-insight') . '</a>';
-    array_unshift($links, $settings_link);    return $links;
+    $settings_url = H2_Product_Insight_Sanitizer::sanitize_url(
+        admin_url('options-general.php?page=h2_product_insight')
+    );
+    $settings_link = sprintf(
+        '<a href="%s">%s</a>',
+        esc_url($settings_url),
+        __('Settings', 'h2-product-insight') // Removed sanitize_field to preserve HTML
+    );
+    array_unshift($links, $settings_link);
+    // Removed sanitization of the entire links array to keep HTML intact
+    return $links;
 }
