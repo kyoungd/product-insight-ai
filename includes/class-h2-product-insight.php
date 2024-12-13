@@ -7,6 +7,7 @@
  * @copyright  Copyright (C) 2024, Young Kwon
  * @license    GPL-2.0-or-later
  * @link       https://2human.ai
+ * @file      includes/class-h2-product-insight.php
  */
 
 if (!defined('ABSPATH')) {
@@ -91,7 +92,6 @@ class H2_Product_Insight {
         );
         wp_localize_script('h2-product-insight-script', 'h2_product_insight_ajax', array(
             'ajax_url'   => H2_Product_Insight_Sanitizer::sanitize_url(admin_url('admin-ajax.php')),
-            'nonce'      => H2_Product_Insight_Sanitizer::sanitize_field(wp_create_nonce('h2_product_insight_nonce')),
             'api_key'    => H2_Product_Insight_Sanitizer::sanitize_field($this->api_key),
             'product_id' => absint($this->product_id ?: get_the_ID())
         ));
@@ -154,6 +154,7 @@ class H2_Product_Insight {
     }
 
     public function handle_initial_call() {
+        // nonce check
         check_ajax_referer('h2_product_insight_nonce', 'nonce');
 
         // Validate and sanitize all POST data
@@ -206,6 +207,7 @@ class H2_Product_Insight {
     }
 
     public function send_product_insight_message() {
+        // nonce check
         check_ajax_referer('h2_product_insight_nonce', 'nonce');
 
         // Validate and sanitize message

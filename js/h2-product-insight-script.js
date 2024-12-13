@@ -6,6 +6,7 @@
  * @copyright  Copyright (C) 2024, Young Kwon
  * @license    GPL-2.0-or-later
  * @link       https://2human.ai
+ * @file       js/h2-product-insight-script.js
  */
 
 jQuery(document).ready(function($) {
@@ -49,7 +50,6 @@ jQuery(document).ready(function($) {
             type: 'POST',
             data: {
                 action: 'h2_product_insight_initial_call',
-                nonce: h2_product_insight_ajax.nonce,
                 subscription_external_id: h2_product_insight_ajax.api_key,
                 timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
                 product_id: h2_product_insight_ajax.product_id,
@@ -103,7 +103,6 @@ jQuery(document).ready(function($) {
             type: 'POST',
             data: {
                 action: 'send_product_insight_message',
-                nonce: h2_product_insight_ajax.nonce,
                 message: message,
                 data: initialResponse
             },

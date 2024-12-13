@@ -7,6 +7,7 @@
  * @copyright  Copyright (C) 2024, Young Kwon
  * @license    GPL-2.0-or-later
  * @link       https://2human.ai
+ * @file       includes/product-insight-settings.php
  */
 
  // File: includes/product-insight-settings.php
@@ -211,9 +212,9 @@ class H2_Product_Insight_Settings {
 
         // Sanitize optional fields
 
-        // Sanitize custom CSS
+        // Sanitize custom CSS using dedicated sanitizer
         if (isset($input['custom_css'])) {
-            $sanitized_input['custom_css'] = H2_Product_Insight_Sanitizer::sanitize_html($input['custom_css']);
+            $sanitized_input['custom_css'] = H2_Product_Insight_Sanitizer::sanitize_custom_css($input['custom_css']);
         } else {
             $sanitized_input['custom_css'] = isset($existing_options['custom_css']) 
                 ? $existing_options['custom_css'] 
@@ -385,7 +386,7 @@ class H2_Product_Insight_Settings {
         check_ajax_referer('h2_activate_product_insight_nonce', 'nonce');
 
         if (!current_user_can('manage_options')) {
-            wp_send_json_error(array('message' => esc_html__('Permission denied.','h2-product-insight')));
+            wp_send_json_error(array('message' => esc_html__('Permission denied.', 'h2-product-insight')));
             return;
         }
 

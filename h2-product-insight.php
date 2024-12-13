@@ -16,6 +16,7 @@
  * WC tested up to: 6.0
  *
  * @package H2_Product_Insight
+ * @file h2-product-insight.php
  */
 
 if (!defined('ABSPATH')) {
@@ -50,7 +51,7 @@ function h2_product_insight_plugin_action_links($links) {
     $settings_link = sprintf(
         '<a href="%s">%s</a>',
         esc_url($settings_url),
-        __('Settings', 'h2-product-insight') // Removed sanitize_field to preserve HTML
+        esc_html__('Settings', 'h2-product-insight')
     );
     array_unshift($links, $settings_link);
     // Removed sanitization of the entire links array to keep HTML intact

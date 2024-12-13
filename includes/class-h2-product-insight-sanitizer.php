@@ -5,6 +5,7 @@
  *
  * @package    H2_Product_Insight
  * @subpackage Classes
+ * @File       class-h2-product-insight-sanitizer.php
  */
 
 if (!defined('ABSPATH')) {
@@ -148,6 +149,131 @@ class H2_Product_Insight_Sanitizer {
     // For HTML attributes
     public static function sanitize_attribute($value) {
         return esc_attr(self::sanitize_field($value));
+    }
+
+    public static function sanitize_custom_css($css) {
+        if (!$css) {
+            return '';
+        }
+    
+        // Remove null bytes
+        $css = str_replace(['\\0', '\\a', '\\f', '\\v'], '', $css);
+    
+        // Remove comments
+        $css = preg_replace('!/\*[^*]*\*+([^/][^*]*\*+)*/!', '', $css);
+    
+        // Remove potentially dangerous protocols and expressions from URLs
+        $css = preg_replace([
+            '/expression\s*\(.*\)/i',           // Remove expressions
+            '/behavior\s*:.*?(;|$)/i',          // Remove behavior
+            '/javascript\s*:/i',                // Remove javascript
+            '/vbscript\s*:/i',                  // Remove vbscript
+            '/@import\s+[^;]+;/i',              // Remove @import
+            '/position\s*:\s*fixed/i',          // Remove position:fixed
+            '/-moz-binding\s*:/i',              // Remove -moz-binding
+            '/binding\s*:/i',                   // Remove binding
+            '/filter\s*:/i'                     // Remove filter
+        ], '', $css);
+    
+        // Allow data URLs for background images after sanitizing
+        $css = preg_replace_callback('/url\s*\(\s*([^)]*)\s*\)/i', function($matches) {
+            $url = trim($matches[1], '"\'');
+            
+            // Allow data URLs and regular URLs
+            if (preg_match('/^data:image\/(?:png|jpg|jpeg|gif|webp|svg\+xml);base64,/i', $url) ||
+                preg_match('/^(?:https?:)?\/\//i', $url) ||
+                preg_match('/^[\/\.](?:[a-zA-Z0-9\-._\/]+)$/i', $url)) {
+                return 'url(' . $url . ')';
+            }
+            
+            return '';
+        }, $css);
+    
+        // Split into rules while preserving media queries and keyframes
+        $css = preg_replace('/\s+/', ' ', $css); // Normalize whitespace
+        $parts = preg_split('/((?:^|})(?:\s*)(?:[^{]+)(?:\s*){(?:[^}]*})+)/', $css, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+        
+        $sanitized = '';
+        foreach ($parts as $part) {
+            $part = trim($part);
+            if (empty($part)) {
+                continue;
+            }
+    
+            // Handle media queries and keyframes
+            if (preg_match('/^@(?:media|keyframes|supports|container)/i', $part)) {
+                // Basic sanitization of media query / keyframe content
+                $part = preg_replace('/[^\w\s\-@:;,.(){}\'"#%]/', '', $part);
+                $sanitized .= $part . "\n";
+                continue;
+            }
+    
+            // Handle regular CSS rules
+            if (strpos($part, '{') !== false) {
+                // Split selector from properties
+                list($selector, $properties) = array_pad(explode('{', $part, 2), 2, '');
+                $selector = trim($selector);
+                $properties = trim(rtrim($properties, '}'));
+    
+                // Basic selector sanitization while allowing more complex selectors
+                $selector = preg_replace('/[^\w\s\-_.,#*+>~:[\]()="|\']/i', '', $selector);
+    
+                // Split properties into name:value pairs
+                $pairs = explode(';', $properties);
+                $sanitized_properties = [];
+    
+                foreach ($pairs as $pair) {
+                    $pair = trim($pair);
+                    if (empty($pair)) {
+                        continue;
+                    }
+    
+                    $property_parts = explode(':', $pair, 2);
+                    if (count($property_parts) !== 2) {
+                        continue;
+                    }
+    
+                    $property_name = trim($property_parts[0]);
+                    $property_value = trim($property_parts[1]);
+    
+                    // Allow custom properties (CSS variables)
+                    if (strpos($property_name, '--') === 0) {
+                        $sanitized_properties[] = $property_name . ': ' . $property_value;
+                        continue;
+                    }
+    
+                    // Allow any valid CSS property name
+                    if (preg_match('/^-?[a-zA-Z0-9\-]+$/', $property_name)) {
+                        // Sanitize property value while allowing most valid CSS values
+                        $property_value = preg_replace(
+                            '/[^\w\s\-_.,#%+~:;()\/\'"]+/', 
+                            '', 
+                            $property_value
+                        );
+                        
+                        // Special handling for gradient and transform values
+                        if (strpos($property_value, 'gradient') !== false || 
+                            strpos($property_value, 'transform') !== false ||
+                            strpos($property_value, 'calc') !== false) {
+                            // Allow more characters for these properties
+                            $property_value = preg_replace(
+                                '/[^\w\s\-_.,#%+~:;()\/\'"deg]+/', 
+                                '', 
+                                $property_value
+                            );
+                        }
+                        
+                        $sanitized_properties[] = $property_name . ': ' . $property_value;
+                    }
+                }
+    
+                if (!empty($sanitized_properties)) {
+                    $sanitized .= $selector . ' { ' . implode('; ', $sanitized_properties) . '; }' . "\n";
+                }
+            }
+        }
+    
+        return trim($sanitized);
     }
 
 }

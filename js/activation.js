@@ -6,6 +6,7 @@
  * @copyright  Copyright (C) 2024, Young Kwon
  * @license    GPL-2.0-or-later
  * @link       https://2human.ai
+ * @file       js/activation.js
  */
 
 jQuery(document).ready(function($) {
