@@ -37,7 +37,7 @@ class H2_Product_Insight_Renderer {
 
         // Include custom CSS if provided
         if (!empty($custom_css)) {
-            $output .= '<style>' . wp_strip_all_tags($custom_css) . '</style>';
+            $output .= '<style>' . esc_html($custom_css) . '</style>';
         }
 
         $output .= self::render_default_template();
@@ -64,8 +64,8 @@ class H2_Product_Insight_Renderer {
             <div id="product-insight-aiinput">
                 <input type="text" 
                        id="product-insight-aiuser-input" 
-                       placeholder="<?php echo H2_Product_Insight_Escaper::escape_translation('Ask about the product...'); ?>" 
-                       aria-label="<?php echo H2_Product_Insight_Escaper::escape_translation('Chat Input'); ?>"
+                       placeholder="<?php echo H2_Product_Insight_Escaper::escape_translation_attribute('Ask about the product...'); ?>" 
+                       aria-label="<?php echo H2_Product_Insight_Escaper::escape_translation_attribute('Chat Input'); ?>"
                        maxlength="1000"
                        pattern="[^<>]*"
                 >

@@ -24,11 +24,15 @@ jQuery(document).ready(function($) {
 
     function addMessage(message, isAI = false) {
         if (isAI) {
-            lastReplyContainer.html('<div class="ai-message">' + message + '</div>');
-            lastReplyContainer.show();
+            lastReplyContainer.empty().append(
+                $('<div>', {
+                    'class': 'ai-message',
+                    'text': message
+                })
+            ).show();
         }
     }
-
+    
     function showProgressBar() {
         console.log('showProgressBar called');
         inputContainer.html('<div class="progress-bar"><div class="progress"></div></div>');

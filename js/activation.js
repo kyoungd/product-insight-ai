@@ -19,7 +19,7 @@ jQuery(document).ready(function($) {
         
         $button.prop('disabled', true);
         $spinner.show();
-        $message.html('Activating...').show().removeClass('updated error');
+        $message.text('Activating...').show().removeClass('updated error');
         
         $.ajax({
             url: h2_product_insight.ajax_url,
@@ -30,19 +30,19 @@ jQuery(document).ready(function($) {
             },            
             success: function(response) {
                 if (response.success) {
-                    $message.html(response.data.message).addClass('updated');
+                    $message.text(response.data.message).addClass('updated');
                     // Reload the page after successful activation
                     setTimeout(function() {
                         window.location.reload();
                     }, 1500);
                 } else {
-                    $message.html('Error: ' + response.data.message).addClass('error');
+                    $message.text('Error: ' + response.data.message).addClass('error');
                     $button.prop('disabled', false);
                     $spinner.hide();
                 }
             },
             error: function(xhr, status, error) {
-                $message.html('Connection error: ' + error).addClass('error');
+                $message.text('Connection error: ' + error).addClass('error');
                 $button.prop('disabled', false);
                 $spinner.hide();
             }

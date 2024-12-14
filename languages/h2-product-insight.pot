@@ -261,6 +261,14 @@ msgstr ""
 msgid "Unknown error occurred"
 msgstr ""
 
+#: includes/class-h2-product-insight.php:...
+msgid "Message is required"
+msgstr ""
+
+#: includes/class-h2-product-insight.php:...
+msgid "Invalid API URL"
+msgstr ""
+
 #: includes/h2-product-insight.php:...
 msgid "Settings"
 msgstr ""

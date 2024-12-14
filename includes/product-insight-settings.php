@@ -83,8 +83,8 @@ class H2_Product_Insight_Settings {
      */
     public function add_admin_menu() {
         add_options_page(
-            H2_Product_Insight_Escaper::escape_translation('H2 Product Insight Settings'), 
-            H2_Product_Insight_Escaper::escape_translation('H2 Product Insight'),         
+            H2_Product_Insight_Escaper::escape_translation_attribute('H2 Product Insight Settings'), 
+            H2_Product_Insight_Escaper::escape_translation_attribute('H2 Product Insight'),         
             'manage_options',                                       
             'h2_product_insight',                                   
             array($this, 'render_settings_page')                   
@@ -242,17 +242,26 @@ class H2_Product_Insight_Settings {
      * Renders the settings page.
      */
     public function render_settings_page() {
-        // Missing default value for get_option
         $this->options = get_option('h2_product_insight_options', array());
         ?>
         <div class="h2-wrap">
-            <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
-            <p><a href="<?php echo esc_url('https://2human.ai/product-insight'); ?>" target="_blank"><?php echo H2_Product_Insight_Escaper::escape_translation('PRODUCT INSIGHT AI HOME'); ?></a></p>
+            <h1><?php echo H2_Product_Insight_Escaper::escape_translation(get_admin_page_title()); ?></h1>
+            <p>
+                <a href="<?php echo esc_url('https://2human.ai/product-insight'); ?>" target="_blank">
+                    <?php echo H2_Product_Insight_Escaper::escape_translation('PRODUCT INSIGHT AI HOME'); ?>
+                </a>
+            </p>
             
             <?php if (H2_ACTIVATION_TEST || empty($this->options['api_key'])) : ?>
                 <form id="h2_activate_product_insight" method="post">
                     <?php wp_nonce_field('h2_activate_product_insight_nonce', 'nonce'); ?>
-                    <button type="button" class="button button-primary" id="h2_activate_button"><?php echo H2_Product_Insight_Escaper::escape_translation('Activate Product Insight AI'); ?></button>
+                    <button 
+                        type="button" 
+                        class="button button-primary" 
+                        id="h2_activate_button"
+                    >
+                        <?php echo H2_Product_Insight_Escaper::escape_translation('Activate Product Insight AI'); ?>
+                    </button>
                 </form>
                 <div id="h2_activation_message"></div>
             <?php else : ?>
@@ -284,16 +293,15 @@ class H2_Product_Insight_Settings {
         $value = isset($this->options['api_key']) ? $this->options['api_key'] : '';
         $error_class = in_array('api_key', $this->invalid_fields) ? 'has-error' : '';
         
-        // Use printf to output the div with escaped class attribute
         printf(
             '<div class="h2-input-wrapper %s">',
-            esc_attr($error_class)
+            H2_Product_Insight_Escaper::escape_translation_attribute($error_class)
         );
         
-        // Use printf to output the input field with escaped attributes
         printf(
-            '<input type="text" id="api_key" name="h2_product_insight_options[api_key]" value="%s" class="regular-text">',
-            esc_attr($value)
+            '<input type="text" id="api_key" name="h2_product_insight_options[api_key]" value="%s" class="regular-text" aria-label="%s">',
+            esc_attr($value),
+            H2_Product_Insight_Escaper::escape_translation_attribute('API Key')
         );
         
         echo '<span class="h2-error-indicator"></span>';
@@ -397,6 +405,7 @@ class H2_Product_Insight_Settings {
             return;
         }
 
+        // send api_key as empty string to get a new key
         $response = wp_remote_post($api_url, array(
             'headers' => array('Content-Type' => 'application/json'),
             'body'    => wp_json_encode(array('api_key' => '')),
@@ -439,8 +448,8 @@ class H2_Product_Insight_Settings {
 
         if ($update_success && isset($options['api_key']) && !empty($options['api_key'])) {
             wp_send_json_success(array(
-                'message' => H2_Product_Insight_Escaper::escape_translation('Product Insight AI activated successfully!'),
-                'api_key' => $options['api_key']
+                'message' => H2_Product_Insight_Escaper::escape_translation('Product Insight AI activated successfully!')
+                // Removed api_key from response since it's not used by JavaScript
             ));
         } else {
             wp_send_json_error(array('message' => H2_Product_Insight_Escaper::escape_translation('Failed to save API key.')));

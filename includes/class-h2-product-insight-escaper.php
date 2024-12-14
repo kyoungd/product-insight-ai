@@ -18,4 +18,8 @@ class H2_Product_Insight_Escaper {
     public static function escape_translation($string) {
         return esc_html__($string, 'h2-product-insight');
     }
+
+    public static function escape_translation_attribute($string) {
+        return esc_attr__($string, 'h2-product-insight');
+    }
 }

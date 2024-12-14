@@ -138,7 +138,7 @@ class H2_Product_Insight {
 
     public function add_product_insight_tab($tabs) {
         $tabs['product_insight'] = array(
-            'title'    => H2_Product_Insight_Escaper::escape_translation('Product Insight'),
+            'title'    => H2_Product_Insight_Escaper::escape_translation_attribute('Product Insight'),
             'priority' => 50,
             'callback' => array($this, 'display_chatbox')
         );
@@ -161,7 +161,7 @@ class H2_Product_Insight {
 
         // Validate and sanitize all POST data
         if (!isset($_POST['subscription_external_id'], $_POST['timeZone'])) {
-            wp_send_json_error('Required fields are missing');
+            wp_send_json_error(H2_Product_Insight_Escaper::escape_translation('Required fields are missing'));
             return;
         }
 
@@ -226,7 +226,7 @@ class H2_Product_Insight {
 
         // Validate and sanitize message
         if (!isset($_POST['message'])) {
-            wp_send_json_error('Message is required');
+            wp_send_json_error(H2_Product_Insight_Escaper::escape_translation('Message is required'));
             return;
         }
 
@@ -252,7 +252,9 @@ class H2_Product_Insight {
         $ai_response = H2_Product_Insight_Sanitizer::sanitize_ai_response($raw_response);
 
         if (!$ai_response || !isset($ai_response->success) || $ai_response->success !== true) {
-            $error_message = isset($ai_response->message) ? $ai_response->message : 'Unknown error occurred';
+            $error_message = isset($ai_response->message) ? 
+                H2_Product_Insight_Escaper::escape_translation($ai_response->message) : 
+                H2_Product_Insight_Escaper::escape_translation('Unknown error occurred');
             wp_send_json_error($error_message);
             return;
         }
@@ -262,7 +264,10 @@ class H2_Product_Insight {
 
     private function call_ai_api_initial($initial_data) {
         if (empty($this->api_key)) {
-            return new WP_Error('api_error', 'API Key is not set. Please configure the plugin settings.');
+            return new WP_Error(
+                'api_error', 
+                H2_Product_Insight_Escaper::escape_translation('API Key is not set. Please configure the plugin settings.')
+            );
         }
 
         $body = wp_json_encode($initial_data);
@@ -270,7 +275,7 @@ class H2_Product_Insight {
         return wp_remote_post(esc_url_raw(H2_PRODUCT_INSIGHT_API_URL . '/query'), array(
             'headers' => array(
                 'Content-Type'  => 'application/json',
-                'Authorization' => 'Bearer ' . sanitize_text_field($this->api_key)
+                'Authorization' => 'Bearer ' . $this->api_key
             ),
             'body'    => $body,
             'timeout' => 15
@@ -279,23 +284,27 @@ class H2_Product_Insight {
 
     private function call_ai_api($message, $initial_data) {
         if (empty($this->api_key)) {
-            return new WP_Error('api_error', H2_Product_Insight_Escaper::escape_translation('API Key is not set.'));
+            return new WP_Error('api_error', 
+                H2_Product_Insight_Escaper::escape_translation('API Key is not set.')
+            );
         }
 
         $url = esc_url(H2_PRODUCT_INSIGHT_API_URL . '/query');
         if (empty($url)) {
-            return new WP_Error('invalid_url', 'Invalid API URL');
+            return new WP_Error('invalid_url', 
+                H2_Product_Insight_Escaper::escape_translation('Invalid API URL')
+            );
         }
 
         $sanitized_data = array(
-            'data'    => H2_Product_Insight_Sanitizer::sanitize_ai_response($initial_data),
-            'message' => sanitize_text_field($message, true)
+            'data'    => $initial_data,
+            'message' => $message
         );
 
         $response = wp_remote_post(esc_url($url), array(
             'headers' => array(
                 'Content-Type'  => 'application/json',
-                'Authorization' => 'Bearer ' . sanitize_text_field($this->api_key) // Changed
+                'Authorization' => 'Bearer ' . $this->api_key // Changed
             ),
             'body'    => wp_json_encode($sanitized_data),
             'timeout' => 15
@@ -329,7 +338,7 @@ class H2_Product_Insight {
         $texts   = array();
 
         foreach ($reviews as $review) {
-            $texts[] = esc_html($review->comment_content);
+            $texts[] = wp_kses_post($review->comment_content);
         }
 
         return implode("\n", $texts);
