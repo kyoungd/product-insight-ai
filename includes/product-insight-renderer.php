@@ -37,7 +37,7 @@ class H2_Product_Insight_Renderer {
 
         // Include custom CSS if provided
         if (!empty($custom_css)) {
-            $output .= '<style>' . $custom_css . '</style>';
+            $output .= '<style>' . wp_strip_all_tags($custom_css) . '</style>';
         }
 
         $output .= self::render_default_template();

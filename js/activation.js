@@ -26,8 +26,8 @@ jQuery(document).ready(function($) {
             type: 'POST',
             data: {
                 action: 'h2_activate_product_insight',
-                nonce: h2_product_insight.nonce  // This should match what we verify in PHP
-            },
+                nonce: h2_product_insight.nonce  // This matches the 'nonce' field now
+            },            
             success: function(response) {
                 if (response.success) {
                     $message.html(response.data.message).addClass('updated');

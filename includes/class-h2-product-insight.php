@@ -305,18 +305,16 @@ class H2_Product_Insight {
     }
 
     private function get_product_title($product) {
-        return esc_html($product->get_name());
+        return $product->get_name();
     }
 
     private function get_product_full_description($product) {
-        // Add sanitization for product descriptions
-        $short_description = esc_html($product->get_short_description());
-        $description = esc_html($product->get_description());
+        $short_description = $product->get_short_description();
+        $description = $product->get_description();
         $reviews = $this->get_product_reviews($product->get_id());
-
+    
         $data1 = implode("\n", array_filter([$short_description, $description, $reviews]));
-        $data2 = esc_html($data1);
-        return $data2;
+        return $data1;
     }
 
     private function get_product_reviews($product_id) {

@@ -143,7 +143,7 @@ class H2_Product_Insight_Settings {
 
         // Sanitize API Key
         if (isset($input['api_key']) && !empty($input['api_key'])) {
-            $sanitized_input['api_key'] = H2_Product_Insight_Sanitizer::sanitize_field($input['api_key']);
+            $sanitized_input['api_key'] = sanitize_text_field($input['api_key']);
         } else {
             $this->invalid_fields[] = 'api_key';
             add_settings_error(
@@ -224,7 +224,7 @@ class H2_Product_Insight_Settings {
 
         // Sanitize Chatbox Placement
         if (isset($input['chatbox_placement'])) {
-            $sanitized_input['chatbox_placement'] = sanitized_text_field($input['chatbox_placement']);
+            $sanitized_input['chatbox_placement'] = sanitize_text_field($input['chatbox_placement']);
         } else {
             $sanitized_input['chatbox_placement'] = isset($existing_options['chatbox_placement']) 
                 ? $existing_options['chatbox_placement'] 
@@ -251,7 +251,7 @@ class H2_Product_Insight_Settings {
             
             <?php if (H2_ACTIVATION_TEST || empty($this->options['api_key'])) : ?>
                 <form id="h2_activate_product_insight" method="post">
-                    <?php wp_nonce_field('h2_activate_product_insight_nonce', 'h2_activate_product_insight_nonce_field'); ?>
+                    <?php wp_nonce_field('h2_activate_product_insight_nonce', 'nonce'); ?>
                     <button type="button" class="button button-primary" id="h2_activate_button"><?php echo H2_Product_Insight_Escaper::escape_translation('Activate Product Insight AI'); ?></button>
                 </form>
                 <div id="h2_activation_message"></div>
