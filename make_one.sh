@@ -32,3 +32,10 @@ if [ -d "includes" ]; then
     done
 fi
 
+# Find and process POD files in languages subdirectory
+if [ -d "languages" ]; then
+    find ./languages/ -type f -name "*.pot" | while read file; do
+        add_file_content "$file"
+    done
+fi
+

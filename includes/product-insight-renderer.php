@@ -27,21 +27,7 @@ class H2_Product_Insight_Renderer {
      * @return string The rendered chatbox HTML.
      */
     public static function render() {
-        $options = get_option('h2_product_insight_options', array());
-        $custom_css = isset($options['custom_css']) ? $options['custom_css'] : '';
-        
-        // Sanitize CSS before storing/processing
-        $custom_css = H2_Product_Insight_Sanitizer::sanitize_custom_css($custom_css);
-
-        $output = '';
-
-        // Include custom CSS if provided
-        if (!empty($custom_css)) {
-            $output .= '<style>' . esc_html($custom_css) . '</style>';
-        }
-
-        $output .= self::render_default_template();
-
+        $output = self::render_default_template();
         return $output;
     }
 

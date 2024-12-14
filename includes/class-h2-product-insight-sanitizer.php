@@ -108,4 +108,32 @@ class H2_Product_Insight_Sanitizer {
             );
         }, $transcription);
     }   
+
+    private static function should_wp_unslash($input) {
+        // Apply wp_unslash to the input string
+        $unslashed = wp_unslash($input);
+    
+        if (!is_string($unslashed))
+            return false;
+
+        // Check if the input is valid JSON (as an example of structured data)
+        $decoded = json_decode($unslashed, true);
+    
+        // If JSON decoding is successful, wp_unslash didn't corrupt the string
+        if (json_last_error() === JSON_ERROR_NONE) {
+            return true;
+        }
+    
+        // Check if the input matches the unslashed output (indicating no slashes were present)
+        if ($input === $unslashed) {
+            return true;
+        }
+    
+        // Otherwise, wp_unslash likely caused corruption
+        return false;
+    }
+
+    public static function sanitize_wp_unslash($input) {
+        return H2_Product_Insight_Sanitizer::should_wp_unslash($input) ? wp_unslash($input) : $input;
+    }
 }

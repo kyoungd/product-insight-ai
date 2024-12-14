@@ -1,4 +1,5 @@
 # Copyright (C) 2024 Young Kwon
+# file: h2-product-insight.pot
 # This file is distributed under the GPL v2 or later.
 msgid ""
 msgstr ""

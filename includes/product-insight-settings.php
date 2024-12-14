@@ -176,7 +176,7 @@ class H2_Product_Insight_Settings {
                 sprintf(
                     /* translators: %s is the error message returned by the API. */
                     H2_Product_Insight_Escaper::escape_translation('API validation request failed: %s. Previous values retained.'),
-                    $response->get_error_message()
+                    esc_html($response->get_error_message())
                 ),
                 'error'
             );
@@ -245,7 +245,7 @@ class H2_Product_Insight_Settings {
         $this->options = get_option('h2_product_insight_options', array());
         ?>
         <div class="h2-wrap">
-            <h1><?php echo H2_Product_Insight_Escaper::escape_translation(get_admin_page_title()); ?></h1>
+            <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
             <p>
                 <a href="<?php echo esc_url('https://2human.ai/product-insight'); ?>" target="_blank">
                     <?php echo H2_Product_Insight_Escaper::escape_translation('PRODUCT INSIGHT AI HOME'); ?>
@@ -253,17 +253,15 @@ class H2_Product_Insight_Settings {
             </p>
             
             <?php if (H2_ACTIVATION_TEST || empty($this->options['api_key'])) : ?>
-                <form id="h2_activate_product_insight" method="post">
+                <form id="h2_activate_product_insight" action="<?php echo esc_url(admin_url('admin-ajax.php')); ?>" method="post">
                     <?php wp_nonce_field('h2_activate_product_insight_nonce', 'nonce'); ?>
-                    <button 
-                        type="button" 
-                        class="button button-primary" 
-                        id="h2_activate_button"
-                    >
+                    <input type="hidden" name="action" value="h2_activate_product_insight" />
+                    <button type="submit" class="button button-primary" id="h2_activate_button">
                         <?php echo H2_Product_Insight_Escaper::escape_translation('Activate Product Insight AI'); ?>
+                        <span class="spinner" style="display:none;"></span>
                     </button>
                 </form>
-                <div id="h2_activation_message"></div>
+                <div id="h2_activation_message" class="notice" style="display:none;"></div>
             <?php else : ?>
                 <form action="<?php echo esc_url(admin_url('options.php')); ?>" method="post">
                 <?php
@@ -413,7 +411,7 @@ class H2_Product_Insight_Settings {
         ));
 
         if (is_wp_error($response)) {
-            wp_send_json_error(array('message' => $response->get_error_message()));
+            wp_send_json_error(array('message' => esc_html($response->get_error_message())));
             return;
         }
 
@@ -422,8 +420,8 @@ class H2_Product_Insight_Settings {
         $result = json_decode($response_body, true);
 
         if ($response_code !== 200 || empty($result['api_key'])) {
-            $error_message = isset($result['message']) ? $result['message'] : H2_Product_Insight_Escaper::escape_translation('API activation failed.');
-            wp_send_json_error(array('message' => $error_message));
+            $error_message = isset($result['message']) ? sanitize_text_field($result['message']) : H2_Product_Insight_Escaper::escape_translation('API activation failed.');
+            wp_send_json_error(array('message' => esc_html($error_message)));
             return;
         }
 
