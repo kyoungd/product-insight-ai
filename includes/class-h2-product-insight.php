@@ -195,16 +195,28 @@ class H2_Product_Insight {
             return;
         }
 
-        $ai_response = json_decode($response['body'], false);
-
+        $raw_data = $response['body'];
+        $ai_response = H2_Product_Insight_Sanitizer::sanitize_ai_response($raw_data);
         if (!$ai_response || !isset($ai_response->success) || $ai_response->success !== true) {
             $error_message = isset($ai_response->message) ? $ai_response->message : 'Unknown error occurred';
             wp_send_json_error($error_message);
             return;
         }
 
-        $ai_response->data->product_title = $product_title;
-        $ai_response->data->product_description = $product_description;
+        // Ensure data object exists
+        if (!isset($ai_response->data)) {
+            $ai_response->data = new stdClass();
+        }
+
+        // Safely assign the properties
+        $ai_response->data = (object) array_merge(
+            (array) $ai_response->data,
+            array(
+                'product_title' => $product_title,
+                'product_description' => $product_description
+            )
+        );
+
         wp_send_json_success($ai_response);
     }
 
@@ -226,7 +238,7 @@ class H2_Product_Insight {
             // First unslash the raw input, then sanitize
             $raw_data = wp_unslash($_POST['data']);
 
-            $initial_data = H2_Product_Insight_Sanitizer::sanitize_array($raw_data);
+            $initial_data = H2_Product_Insight_Sanitizer::sanitize_ai_response($raw_data);
         }
 
         $response = $this->call_ai_api($user_message, $initial_data);
@@ -236,7 +248,8 @@ class H2_Product_Insight {
             return;
         }
 
-        $ai_response = json_decode($response['body'], false);
+        $raw_response = $response['body'];
+        $ai_response = H2_Product_Insight_Sanitizer::sanitize_ai_response($raw_response);
 
         if (!$ai_response || !isset($ai_response->success) || $ai_response->success !== true) {
             $error_message = isset($ai_response->message) ? $ai_response->message : 'Unknown error occurred';
@@ -275,7 +288,7 @@ class H2_Product_Insight {
         }
 
         $sanitized_data = array(
-            'data'    => H2_Product_Insight_Sanitizer::sanitize_array($initial_data),
+            'data'    => H2_Product_Insight_Sanitizer::sanitize_ai_response($initial_data),
             'message' => sanitize_text_field($message, true)
         );
 
