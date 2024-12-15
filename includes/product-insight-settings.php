@@ -293,7 +293,7 @@ class H2_Product_Insight_Settings {
         
         printf(
             '<div class="h2-input-wrapper %s">',
-            H2_Product_Insight_Escaper::escape_translation_attribute($error_class)
+            esc_attr($error_class)
         );
         
         printf(

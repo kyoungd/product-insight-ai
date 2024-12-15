@@ -75,7 +75,7 @@ class H2_Product_Insight_Sanitizer {
                 'email' => sanitize_email($data['email'] ?? ''),
                 'id' => sanitize_key($data['id'] ?? ''),
                 'mark_index' => absint($data['mark_index'] ?? 0),
-                'message' => wp_kses_post($data['message'] ?? ''),
+                'message' => esc_html($data['message'] ?? ''),
                 'state' => sanitize_text_field($data['state'] ?? ''),
                 'subscription_external_id' => sanitize_key($data['subscription_external_id'] ?? ''),
                 'timezone' => sanitize_text_field($data['timezone'] ?? ''),

@@ -365,7 +365,7 @@ class H2_Product_Insight_Sanitizer {
                 'email' => sanitize_email($data['email'] ?? ''),
                 'id' => sanitize_key($data['id'] ?? ''),
                 'mark_index' => absint($data['mark_index'] ?? 0),
-                'message' => wp_kses_post($data['message'] ?? ''),
+                'message' => esc_html($data['message'] ?? ''),
                 'state' => sanitize_text_field($data['state'] ?? ''),
                 'subscription_external_id' => sanitize_key($data['subscription_external_id'] ?? ''),
                 'timezone' => sanitize_text_field($data['timezone'] ?? ''),
@@ -489,19 +489,7 @@ class H2_Product_Insight_Renderer {
      * @return string The rendered chatbox HTML.
      */
     public static function render() {
-        $options = get_option('h2_product_insight_options', array());
-        $custom_css = isset($options['custom_css']) ? $options['custom_css'] : '';
-        $safe_css = H2_Product_Insight_Sanitizer::sanitize_custom_css($custom_css);
-                
-        $output = '';
-
-        // Include custom CSS if provided
-        if (!empty($custom_css)) {
-            $output .= '<style>' . esc_html($safe_css) . '</style>';
-        }
-
-        $output .= self::render_default_template();
-
+        $output = self::render_default_template();
         return $output;
     }
 
@@ -859,6 +847,13 @@ class H2_Product_Insight {
             'product_id' => absint($this->product_id ?: get_the_ID()),
             'nonce'      => wp_create_nonce('h2_product_insight_nonce') // Add this line
         ));
+
+        // Add custom CSS if it exists
+        $options = get_option('h2_product_insight_options', array());
+        if (!empty($options['custom_css'])) {
+            $custom_css = H2_Product_Insight_Sanitizer::sanitize_custom_css($options['custom_css']);
+            wp_add_inline_style('product-insight-style', $custom_css);
+        }
     }
 
     public function add_chatbox_display_hook() {
@@ -889,10 +884,9 @@ class H2_Product_Insight {
     }
 
     public function display_chatbox() {
-        // Modified to work for both WooCommerce and shortcode
+        // First ensure scripts are loaded
         if (is_product() || $this->product_id) {
-            $this->product_id = get_the_ID();
-            // Enqueue scripts now that product_id is set
+            $this->product_id = $this->product_id ?: get_the_ID();
             $this->enqueue_scripts();
             echo wp_kses_post($this->render_chatbox());
         }
@@ -912,9 +906,13 @@ class H2_Product_Insight {
         if (!$this->product_id && is_product()) {
             $this->product_id = get_the_ID();
         }
-        // Scripts are already enqueued in the previous methods
-        $html = H2_Product_Insight_Renderer::render();
-        return wp_kses_post($html);
+        
+        // Ensure scripts are loaded before rendering
+        if (!wp_script_is('h2-product-insight-script', 'enqueued')) {
+            $this->enqueue_scripts();
+        }
+        
+        return H2_Product_Insight_Renderer::render();
     }
 
     public function handle_initial_call() {
@@ -1437,7 +1435,7 @@ class H2_Product_Insight_Settings {
         
         printf(
             '<div class="h2-input-wrapper %s">',
-            H2_Product_Insight_Escaper::escape_translation_attribute($error_class)
+            esc_attr($error_class)
         );
         
         printf(
@@ -1602,304 +1600,4 @@ class H2_Product_Insight_Settings {
 }
 
 === End of ./includes/product-insight-settings.php ===
-
-=== File: ./languages/h2-product-insight.pot ===
-
-# Copyright (C) 2024 Young Kwon
-# file: h2-product-insight.pot
-# This file is distributed under the GPL v2 or later.
-msgid ""
-msgstr ""
-"Project-Id-Version: H2 Product Insight 1.4\n"
-"POT-Creation-Date: 2024-04-27 12:00+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
-"Language: \n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-
-"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/h2-product-insight\n"
-"X-Generator: WP-CLI 2.11.0\n"
-"X-Domain: h2-product-insight\n"
-
-#. Plugin Name of the plugin
-#: h2-product-insight.php
-msgid "H2 Product Insight"
-msgstr ""
-
-#. Plugin URI of the plugin
-#: h2-product-insight.php
-msgid "https://2human.ai/product-insight"
-msgstr ""
-
-#. Description of the plugin
-#: h2-product-insight.php
-msgid "AI-powered Product Insight for WooCommerce products. Adds an intelligent chatbot that helps customers understand your products better."
-msgstr ""
-
-#. Author of the plugin
-#: h2-product-insight.php
-msgid "Young Kwon"
-msgstr ""
-
-#. Author URI of the plugin
-#: h2-product-insight.php
-msgid "https://2human.ai"
-msgstr ""
-
-#: h2-product-insight.php:47
-msgid "Settings"
-msgstr ""
-
-#: includes/class-h2-product-insight.php:138
-msgid "Product Insight"
-msgstr ""
-
-#: includes/product-insight-renderer.php:58
-msgid "Ask about the product..."
-msgstr ""
-
-#: includes/product-insight-renderer.php:58
-msgid "Chat Input"
-msgstr ""
-
-#: includes/product-insight-renderer.php:59
-msgid "Initializing..."
-msgstr ""
-
-#: includes/product-insight-settings.php:77
-msgid "H2 Product Insight Settings"
-msgstr ""
-
-#: includes/product-insight-settings.php:78
-msgid "H2 AI"
-msgstr ""
-
-#: includes/product-insight-settings.php:93
-msgid "General Settings"
-msgstr ""
-
-#: includes/product-insight-settings.php:101
-msgid "API Key"
-msgstr ""
-
-#: includes/product-insight-settings.php:110
-msgid "Chatbox Placement"
-msgstr ""
-
-#: includes/product-insight-settings.php:119
-msgid "Custom CSS"
-msgstr ""
-
-#: includes/product-insight-settings.php:139
-msgid "API Key is required. Previous key retained."
-msgstr ""
-
-#: includes/product-insight-settings.php:164
-msgid "API validation request failed: %s. Previous values retained."
-msgstr ""
-
-#: includes/product-insight-settings.php:180
-msgid "API validation failed. Previous values retained."
-msgstr ""
-
-#: includes/product-insight-settings.php:194
-msgid "API connection validated successfully."
-msgstr ""
-
-#: includes/product-insight-settings.php:235
-msgid "PRODUCT INSIGHT AI HOME"
-msgstr ""
-
-#: includes/product-insight-settings.php:240
-msgid "Activate Product Insight AI"
-msgstr ""
-
-#: includes/product-insight-settings.php:265
-msgid "Configure the settings for the H2 Product Insight plugin."
-msgstr ""
-
-#: includes/product-insight-settings.php:285
-msgid "Before Single Product"
-msgstr ""
-
-#: includes/product-insight-settings.php:288
-msgid "Before Product Title"
-msgstr ""
-
-#: includes/product-insight-settings.php:289
-msgid "After Product Title"
-msgstr ""
-
-#: includes/product-insight-settings.php:292
-msgid "Before Price"
-msgstr ""
-
-#: includes/product-insight-settings.php:293
-msgid "After Price"
-msgstr ""
-
-#: includes/product-insight-settings.php:296
-msgid "Before Short Description"
-msgstr ""
-
-#: includes/product-insight-settings.php:297
-msgid "After Short Description"
-msgstr ""
-
-#: includes/product-insight-settings.php:300
-msgid "Before Add to Cart Button"
-msgstr ""
-
-#: includes/product-insight-settings.php:301
-msgid "After Add to Cart Button"
-msgstr ""
-
-#: includes/product-insight-settings.php:304
-msgid "Before Product Meta"
-msgstr ""
-
-#: includes/product-insight-settings.php:305
-msgid "After Product Meta"
-msgstr ""
-
-#: includes/product-insight-settings.php:308
-msgid "Before Product Summary"
-msgstr ""
-
-#: includes/product-insight-settings.php:309
-msgid "After Product Summary"
-msgstr ""
-
-#: includes/product-insight-settings.php:312
-msgid "Before Tabs"
-msgstr ""
-
-#: includes/product-insight-settings.php:313
-msgid "In Product Tabs"
-msgstr ""
-
-#: includes/product-insight-settings.php:314
-msgid "After Tabs"
-msgstr ""
-
-#: includes/product-insight-settings.php:317
-msgid "Before Related Products"
-msgstr ""
-
-#: includes/product-insight-settings.php:318
-msgid "After Related Products"
-msgstr ""
-
-#: includes/product-insight-settings.php:321
-msgid "After Single Product"
-msgstr ""
-
-#: includes/product-insight-settings.php:324
-msgid "In Product Sidebar"
-msgstr ""
-
-#: includes/product-insight-settings.php:333
-msgid "Select where to display the chatbox on product pages"
-msgstr ""
-
-#: includes/product-insight-settings.php:342
-msgid "Enter any custom CSS to style the chatbox."
-msgstr ""
-
-#: includes/product-insight-settings.php:356
-msgid "Permission denied."
-msgstr ""
-
-#: includes/product-insight-settings.php:378
-msgid "API activation failed."
-msgstr ""
-
-#: includes/product-insight-settings.php:412
-msgid "Product Insight AI activated successfully!"
-msgstr ""
-
-#: includes/product-insight-settings.php:416
-msgid "Failed to save API key."
-msgstr ""
-
-#: includes/product-insight-settings.php:...
-msgid "API Key is required."
-msgstr ""
-
-#: includes/product-insight-settings.php:...
-msgid "Invalid API Key provided."
-msgstr ""
-
-#: includes/product-insight-settings.php:...
-msgid "API Key validated successfully."
-msgstr ""
-
-#: includes/class-h2-product-insight.php:...
-msgid "Unauthorized user"
-msgstr ""
-
-#: includes/class-h2-product-insight.php:...
-msgid "API URL is invalid"
-msgstr ""
-
-#: includes/class-h2-product-insight.php:...
-msgid "Failed to activate API Key"
-msgstr ""
-
-#: includes/class-h2-product-insight.php:...
-msgid "Failed to save API Key"
-msgstr ""
-
-#: includes/class-h2-product-insight.php:...
-msgid "API Key activated successfully."
-msgstr ""
-
-#: includes/class-h2-product-insight.php:...
-msgid "Send Product Insight Message"
-msgstr ""
-
-#: includes/class-h2-product-insight.php:...
-msgid "Failed to send message."
-msgstr ""
-
-#: includes/class-h2-product-insight.php:...
-msgid "Unknown error occurred"
-msgstr ""
-
-#: includes/class-h2-product-insight.php:...
-msgid "Message is required"
-msgstr ""
-
-#: includes/class-h2-product-insight.php:...
-msgid "Invalid API URL"
-msgstr ""
-
-#: includes/h2-product-insight.php:...
-msgid "Settings"
-msgstr ""
-
-#: includes/h2-product-insight.php:...
-msgid "Settings"
-msgstr ""
-
-#: includes/product-insight-renderer.php:...
-msgid "Ask your question here..."
-msgstr ""
-
-#: includes/product-insight-renderer.php:...
-msgid "Send"
-msgstr ""
-
-#: includes/product-insight-renderer.php:...
-msgid "Loading..."
-msgstr ""
-
-#: includes/product-insight-renderer.php:...
-msgid "End of Conversation"
-msgstr ""
-
-=== End of ./languages/h2-product-insight.pot ===
 
