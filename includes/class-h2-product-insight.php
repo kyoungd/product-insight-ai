@@ -169,7 +169,7 @@ class H2_Product_Insight {
     
         // 2. Validate that required fields exist
         if (!isset($_POST['subscription_external_id'], $_POST['timeZone'])) {
-            wp_send_json_error(H2_Product_Insight_Escaper::escape_translation('Required fields are missing'));
+            wp_send_json_error(esc_html__('Required fields are missing', 'h2-product-insight'));
             return;
         }
 
@@ -183,7 +183,7 @@ class H2_Product_Insight {
     
         // 4. Additional validation if needed
         if (empty($subscription_id) || empty($timezone)) {
-            wp_send_json_error(H2_Product_Insight_Escaper::escape_translation('Invalid input data'));
+            wp_send_json_error(esc_html__('Invalid input data', 'h2-product-insight'));
             return;
         }
     
@@ -306,7 +306,7 @@ class H2_Product_Insight {
         if (empty($this->api_key)) {
             return new WP_Error(
                 'api_error', 
-                H2_Product_Insight_Escaper::escape_translation('API Key is not set. Please configure the plugin settings.')
+                esc_html__('API Key is not set. Please configure the plugin settings.', 'h2-product-insight')
             );
         }
 

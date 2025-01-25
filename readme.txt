@@ -89,3 +89,44 @@ This plugin:
 This plugin connects to:
 
 * [2human.ai API](https://2human.ai/wp-json) for AI responses.
+
+
+== External Services ==
+
+This plugin connects to an external API provided by 2Human.ai to validate API keys and retrieve product insights. This is necessary for the plugin to function correctly and provide the intended features.
+
+=== What data is sent and when ===
+- **API Key Validation**: When the plugin is configured, it sends the provided API key to `https://2human.ai/wp-json/my-first-plugin/v1/validate-api-key` to validate its authenticity.
+- **Product Insights Query**: When the plugin retrieves product insights, it sends relevant data (e.g., product IDs, user preferences, etc.) to `https://2human.ai/wp-json/my-first-plugin/v1/query`.
+
+=== Data Transmission ===
+- The plugin sends the following data to the external service:
+  - API key (for validation purposes).
+  - Product-related data (for querying insights).
+- Data is transmitted securely over HTTPS.
+
+=== Service Provider ===
+- The external service is provided by 2Human.ai.
+- **Terms of Service**: [2Human.ai Terms of Service](https://2human.ai/terms-of-service)
+- **Privacy Policy**: [2Human.ai Privacy Policy](https://2human.ai/privacy-policy)
+
+
+== External Services ==
+
+This plugin connects to an external API provided by 2Human.ai to validate API keys and retrieve product insights. This is necessary for the plugin to function correctly and provide the intended features.
+
+=== What data is sent and when ===
+- **API Key Validation**: When the plugin is configured, it sends the provided API key to `https://2human.ai/wp-json/my-first-plugin/v1/validate-api-key` to validate its authenticity.
+- **Product Insights Query**: When the plugin receives a query, it sends relevant data (e.g., product information, user query, etc.) to `https://2human.ai/wp-json/my-first-plugin/v1/query`.
+
+=== Data Transmission ===
+- The plugin sends the following data to the external service:
+  - API key (for validation purposes).
+  - Product-related data (for querying insights).
+  - User query (user questions)
+- Data is transmitted securely over HTTPS.
+
+=== Service Provider ===
+- The external service is provided by 2Human.ai.
+- **Terms of Service**: [2Human.ai Terms of Service](https://2human.ai/terms-of-service)
+- **Privacy Policy**: [2Human.ai Privacy Policy](https://2human.ai/privacy)

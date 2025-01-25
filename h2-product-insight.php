@@ -49,7 +49,7 @@ function h2_product_insight_plugin_action_links($links) {
     $settings_link = sprintf(
         '<a href="%s">%s</a>',
         esc_url($settings_url),
-        H2_Product_Insight_Escaper::escape_translation('Settings')
+        esc_html__('Settings', 'h2-product-insight')
     );
     array_unshift($links, $settings_link);
     return $links;

@@ -50,13 +50,13 @@ class H2_Product_Insight_Renderer {
             <div id="product-insight-aiinput">
                 <input type="text" 
                        id="product-insight-aiuser-input" 
-                       placeholder="<?php echo H2_Product_Insight_Escaper::escape_translation_attribute('Ask about the product...'); ?>" 
-                       aria-label="<?php echo H2_Product_Insight_Escaper::escape_translation_attribute('Chat Input'); ?>"
+                       placeholder="<?php echo esc_attr__('Ask about the product...', 'h2-product-insight'); ?>" 
+                       aria-label="<?php echo esc_attr__('Chat Input', 'h2-product-insight'); ?>"
                        maxlength="1000"
                        pattern="[^<>]*"
                 >
                 <div id="product-insight-ailoading" style="display: none;">
-                    <?php echo H2_Product_Insight_Escaper::escape_translation('Initializing...'); ?>
+                    <?php echo esc_html__('Initializing...', 'h2-product-insight'); ?>
                 </div>
             </div>
             <div id="product-insight-ailast-reply-container" style="display: none;"></div>

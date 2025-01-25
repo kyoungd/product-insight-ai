@@ -561,11 +561,11 @@ define('H2_PRODUCT_INSIGHT_MAX_MESSAGE_LENGTH', 1000);
 define('H2_PRODUCT_INSIGHT_MAX_QUERY_LENGTH', 2000);
 
 define('H2_PRODUCT_INSIGHT_SECURITY_PATTERNS', array(
-    '/<script\b[^>]*>(.*?)<\/script>/is', // Remove <script> tags
-    '/<iframe\b[^>]*>(.*?)<\/iframe>/is', // Remove <iframe> tags
-    '/on\w+\s*=\s*".*?"/is',             // Remove inline event handlers in double quotes
-    "/on\w+\s*=\s*'.*?'/is",             // Remove inline event handlers in single quotes
-    '/on\w+\s*=\s*\w+/is',               // Remove inline event handlers without quotes
+    '/\\<script\\b[^>]*\\>.*?\\<\\/script\\>/is',  // Remove <script> tags (escaped)
+    '/\\<iframe\\b[^>]*\\>.*?\\<\\/iframe\\>/is',  // Remove <iframe> tags (escaped)
+    '/on\\w+\\s*=\\s*".*?"/is',                    // Remove inline event handlers in double quotes
+    "/on\\w+\\s*=\\s*'.*?'/is",                    // Remove inline event handlers in single quotes
+    '/on\\w+\\s*=\\s*\\w+/is',                     // Remove inline event handlers without quotes
 ));
 
 define('H2_PRODUCT_INSIGHT_INVALID_INPUTS', array(
@@ -801,7 +801,7 @@ class H2_Product_Insight {
         // Add shortcode registration
         add_shortcode('h2_product_insight', array($this, 'handle_shortcode'));
 
-        // NEW: Enqueue scripts and styles
+        // Enqueue scripts and styles
         add_action('wp_enqueue_scripts', array($this, 'enqueue_scripts'));
     }
 
@@ -822,8 +822,6 @@ class H2_Product_Insight {
     public function init() {
         $options = get_option('h2_product_insight_options', array()); // Added default array value
         $this->api_key = isset($options['api_key']) ? sanitize_text_field($options['api_key']) : '';
-
-        // Scripts will be enqueued when rendering the chatbox
     }
 
     public function enqueue_scripts() {
