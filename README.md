@@ -20,3 +20,7 @@ Gain Customer Insights: Collects data on customer queries and preferences, provi
 This module is ideal for businesses seeking to improve their online presence, drive sales, and provide a superior shopping experience with minimal effort and investment.
 
 
+TRANSLATION
+
+msginit --locale=es_ES --input=h2-product-insight.pot --output=es_ES.po
+msgfmt h2-product-insight-es_ES.po --output-file=h2-product-insight-es_ES.mo

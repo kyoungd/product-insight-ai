@@ -51,8 +51,8 @@ class H2_Product_Insight {
         // Add shortcode registration
         add_shortcode('h2_product_insight', array($this, 'handle_shortcode'));
 
-        // Remove the script enqueuing from the init method
-        // add_action('wp_enqueue_scripts', array($this, 'enqueue_scripts'));
+        // Enqueue scripts and styles
+        add_action('wp_enqueue_scripts', array($this, 'enqueue_scripts'));
     }
 
     // Add this new method to handle shortcode
@@ -72,8 +72,6 @@ class H2_Product_Insight {
     public function init() {
         $options = get_option('h2_product_insight_options', array()); // Added default array value
         $this->api_key = isset($options['api_key']) ? sanitize_text_field($options['api_key']) : '';
-
-        // Scripts will be enqueued when rendering the chatbox
     }
 
     public function enqueue_scripts() {

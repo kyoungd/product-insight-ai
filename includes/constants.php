@@ -25,11 +25,11 @@ define('H2_PRODUCT_INSIGHT_MAX_MESSAGE_LENGTH', 1000);
 define('H2_PRODUCT_INSIGHT_MAX_QUERY_LENGTH', 2000);
 
 define('H2_PRODUCT_INSIGHT_SECURITY_PATTERNS', array(
-    '/<script\b[^>]*>(.*?)<\/script>/is', // Remove <script> tags
-    '/<iframe\b[^>]*>(.*?)<\/iframe>/is', // Remove <iframe> tags
-    '/on\w+\s*=\s*".*?"/is',             // Remove inline event handlers in double quotes
-    "/on\w+\s*=\s*'.*?'/is",             // Remove inline event handlers in single quotes
-    '/on\w+\s*=\s*\w+/is',               // Remove inline event handlers without quotes
+    '/\\<script\\b[^>]*\\>.*?\\<\\/script\\>/is',  // Remove <script> tags (escaped)
+    '/\\<iframe\\b[^>]*\\>.*?\\<\\/iframe\\>/is',  // Remove <iframe> tags (escaped)
+    '/on\\w+\\s*=\\s*".*?"/is',                    // Remove inline event handlers in double quotes
+    "/on\\w+\\s*=\\s*'.*?'/is",                    // Remove inline event handlers in single quotes
+    '/on\\w+\\s*=\\s*\\w+/is',                     // Remove inline event handlers without quotes
 ));
 
 define('H2_PRODUCT_INSIGHT_INVALID_INPUTS', array(

@@ -801,8 +801,8 @@ class H2_Product_Insight {
         // Add shortcode registration
         add_shortcode('h2_product_insight', array($this, 'handle_shortcode'));
 
-        // Remove the script enqueuing from the init method
-        // add_action('wp_enqueue_scripts', array($this, 'enqueue_scripts'));
+        // NEW: Enqueue scripts and styles
+        add_action('wp_enqueue_scripts', array($this, 'enqueue_scripts'));
     }
 
     // Add this new method to handle shortcode

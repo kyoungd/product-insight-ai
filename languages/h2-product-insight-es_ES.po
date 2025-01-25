@@ -5,17 +5,18 @@ msgid ""
 msgstr ""
 "Project-Id-Version: H2 Product Insight 1.4\n"
 "POT-Creation-Date: 2024-04-27 12:00+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
-"Language: \n"
+"PO-Revision-Date: 2024-12-15 13:30-0800\n"
+"Last-Translator: Young <kyoungd@hotmail.com>\n"
+"Language-Team: Spanish <es@tp.org.es>\n"
+"Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-
-"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/h2-product-insight\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/h2-product-"
+"insight\n"
 "X-Generator: WP-CLI 2.11.0\n"
 "X-Domain: h2-product-insight\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #. Plugin Name of the plugin
 #: h2-product-insight.php
@@ -29,7 +30,9 @@ msgstr ""
 
 #. Description of the plugin
 #: h2-product-insight.php
-msgid "AI-powered Product Insight for WooCommerce products. Adds an intelligent chatbot that helps customers understand your products better."
+msgid ""
+"AI-powered Product Insight for WooCommerce products. Adds an intelligent "
+"chatbot that helps customers understand your products better."
 msgstr ""
 
 #. Author of the plugin

@@ -1,5 +1,5 @@
 === H2 Product Insight ===
-Contributors: young kwon
+Contributors: kyoungd
 Donate link: 
 Tags: artificial intelligence, product insight, product question answer
 Requires at least: 5.0

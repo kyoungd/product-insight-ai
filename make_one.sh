@@ -14,7 +14,7 @@ add_file_content() {
 }
 
 # Find and process PHP files in current directory
-find . -maxdepth 1 -name "*.php" -type f | while read file; do
+find . -maxdepth 1 -name "*.php" -type f -not -name "make_one.php" | while read file; do
     add_file_content "$file"
 done
 
@@ -31,11 +31,3 @@ if [ -d "includes" ]; then
         add_file_content "$file"
     done
 fi
-
-# # Find and process POD files in languages subdirectory
-# if [ -d "languages" ]; then
-#     find ./languages/ -type f -name "*.pot" | while read file; do
-#         add_file_content "$file"
-#     done
-# fi
-
