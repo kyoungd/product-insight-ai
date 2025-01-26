@@ -53,7 +53,7 @@ jQuery(document).ready(function($) {
             url: h2_product_insight_ajax.ajax_url,
             type: 'POST',
             data: {
-                action: 'h2_product_insight_initial_call',
+                action: 'h2piai_product_insight_initial_call',
                 nonce: h2_product_insight_ajax.nonce,  // Add this line
                 subscription_external_id: h2_product_insight_ajax.api_key,
                 timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -113,7 +113,7 @@ jQuery(document).ready(function($) {
             url: h2_product_insight_ajax.ajax_url,
             type: 'POST',
             data: {
-                action: 'send_product_insight_message',
+                action: 'h2piai_send_product_insight_message',
                 nonce: h2_product_insight_ajax.nonce,
                 message: message,
                 data: h2piai_initialResponse

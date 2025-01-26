@@ -39,10 +39,10 @@ class H2PIAI_Product_Insight_Main {
         add_action('init', array($this, 'init'));
 
         // AJAX action hooks
-        add_action('wp_ajax_send_product_insight_message', array($this, 'send_product_insight_message'));
-        add_action('wp_ajax_nopriv_send_product_insight_message', array($this, 'send_product_insight_message'));
-        add_action('wp_ajax_h2_product_insight_initial_call', array($this, 'handle_initial_call'));
-        add_action('wp_ajax_nopriv_h2_product_insight_initial_call', array($this, 'handle_initial_call'));
+        add_action('wp_ajax_h2piai_send_product_insight_message', array($this, 'h2piai_send_product_insight_message'));
+        add_action('wp_ajax_nopriv_h2piai_send_product_insight_message', array($this, 'h2piai_send_product_insight_message'));
+        add_action('wp_ajax_h2piai_product_insight_initial_call', array($this, 'h2piai_handle_initial_call'));
+        add_action('wp_ajax_nopriv_h2piai_product_insight_initial_call', array($this, 'h2piai_handle_initial_call'));
 
         // Hook to display the chatbox
         add_action('init', array($this, 'add_chatbox_display_hook'));
@@ -162,7 +162,7 @@ class H2PIAI_Product_Insight_Main {
         return H2PIAI_Product_Insight_Renderer::render();
     }
 
-    public function handle_initial_call() {
+    public function h2piai_handle_initial_call() {
         // Verify nonce first
         if (!check_ajax_referer('h2_product_insight_nonce', 'nonce', false)) {
             wp_send_json_error(esc_html__('Security check failed.', 'h2-product-insight'));
@@ -269,7 +269,7 @@ class H2PIAI_Product_Insight_Main {
         wp_send_json_success($ai_response);
     }
 
-    public function send_product_insight_message() {
+    public function h2piai_send_product_insight_message() {
         // Verify nonce first
         if (!check_ajax_referer('h2_product_insight_nonce', 'nonce', false)) {
             wp_send_json_error(esc_html__('Security check failed.', 'h2-product-insight'));

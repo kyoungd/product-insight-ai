@@ -35,16 +35,16 @@ require_once plugin_dir_path(__FILE__) . 'includes/class-h2-product-insight.php'
 require_once plugin_dir_path(__FILE__) . 'includes/class-h2-product-insight-sanitizer.php';
 
 // Initialize the plugin
-function h2_product_insight_init() {
+function h2piai_product_insight_initialization() {
     load_plugin_textdomain('h2-product-insight', false, dirname(plugin_basename(__FILE__)) . '/languages/');
     new H2PIAI_Product_Insight_Main();
 }
-add_action('plugins_loaded', 'h2_product_insight_init');
+add_action('plugins_loaded', 'h2piai_product_insight_initialization');
 
 // Add a "Settings" link to the plugin action links
-add_filter('plugin_action_links_' . plugin_basename(__FILE__), 'h2_product_insight_plugin_action_links');
+add_filter('plugin_action_links_' . plugin_basename(__FILE__), 'h2piai_product_insight_plugin_action_links');
 
-function h2_product_insight_plugin_action_links($links) {
+function h2piai_product_insight_plugin_action_links($links) {
     $settings_url = admin_url('options-general.php?page=h2piai_product_insight');
     $settings_link = sprintf(
         '<a href="%s">%s</a>',
