@@ -100,15 +100,21 @@ jQuery(document).ready(function($) {
     }
 
     function proceedWithMessage(message) {
-        // Sanitize message before sending
+        // Basic client-side sanitization
         message = message.replace(/[<>]/g, '').trim().substring(0, 1000);
         
+        // Add data validation before sending
+        if (!message || !h2_product_insight_ajax.nonce) {
+            addMessage('Invalid input data', true);
+            return;
+        }
+
         $.ajax({
             url: h2_product_insight_ajax.ajax_url,
             type: 'POST',
             data: {
                 action: 'send_product_insight_message',
-                nonce: h2_product_insight_ajax.nonce,  // Add this line
+                nonce: h2_product_insight_ajax.nonce,
                 message: message,
                 data: initialResponse
             },

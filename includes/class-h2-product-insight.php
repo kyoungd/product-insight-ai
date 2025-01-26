@@ -19,7 +19,6 @@ require_once plugin_dir_path(__FILE__) . './constants.php';
 require_once plugin_dir_path(__FILE__) . './product-insight-settings.php';
 require_once plugin_dir_path(__FILE__) . './product-insight-renderer.php';
 require_once plugin_dir_path(__FILE__) . './class-h2-product-insight-sanitizer.php';
-require_once plugin_dir_path(__FILE__) . './class-h2-product-insight-escaper.php';
 
 /**
  * Main plugin class
@@ -164,29 +163,59 @@ class H2_Product_Insight {
     }
 
     public function handle_initial_call() {
-        // 1. Nonce check
-        check_ajax_referer('h2_product_insight_nonce', 'nonce');
-    
-        // 2. Validate that required fields exist
+        // Verify nonce first
+        if (!check_ajax_referer('h2_product_insight_nonce', 'nonce', false)) {
+            wp_send_json_error(esc_html__('Security check failed.', 'h2-product-insight'));
+            return;
+        }
+
+        // Validate required fields exist
         if (!isset($_POST['subscription_external_id'], $_POST['timeZone'])) {
             wp_send_json_error(esc_html__('Required fields are missing', 'h2-product-insight'));
             return;
         }
 
-        // 3. Validate and sanitize ALL POST data before using it
-        $subscription_id = sanitize_text_field(H2_Product_Insight_Sanitizer::sanitize_wp_unslash($_POST['subscription_external_id']));
-        $timezone = sanitize_text_field(H2_Product_Insight_Sanitizer::sanitize_wp_unslash($_POST['timeZone']));
-        $caller_domain = isset($_POST['caller_domain']) ? 
-            sanitize_text_field(H2_Product_Insight_Sanitizer::sanitize_wp_unslash($_POST['caller_domain'])) : '';
-        $product_id = isset($_POST['product_id']) ? 
-            absint(H2_Product_Insight_Sanitizer::sanitize_wp_unslash($_POST['product_id'])) : 0;
-    
-        // 4. Additional validation if needed
-        if (empty($subscription_id) || empty($timezone)) {
-            wp_send_json_error(esc_html__('Invalid input data', 'h2-product-insight'));
+        // Sanitize and validate inputs
+        $subscription_id = sanitize_text_field(wp_unslash($_POST['subscription_external_id']));
+        if (empty($subscription_id)) {
+            wp_send_json_error(esc_html__('Invalid subscription ID', 'h2-product-insight'));
             return;
         }
-    
+
+        $timezone = sanitize_text_field(wp_unslash($_POST['timeZone']));
+        if (!in_array($timezone, timezone_identifiers_list(), true)) {
+            wp_send_json_error(esc_html__('Invalid timezone', 'h2-product-insight'));
+            return;
+        }
+
+        $caller_domain = '';
+        if (isset($_POST['caller_domain'])) {
+            $caller_domain = sanitize_text_field(wp_unslash($_POST['caller_domain']));
+            if (empty($caller_domain)) {
+                wp_send_json_error(esc_html__('Invalid domain', 'h2-product-insight'));
+                return;
+            }
+
+            // Ensure the domain starts with http:// or https://
+            if (strpos($caller_domain, 'http://') !== 0 && strpos($caller_domain, 'https://') !== 0) {
+                $caller_domain = 'https://' . $caller_domain;
+            }            
+
+            if (!wp_http_validate_url($caller_domain)) {
+                wp_send_json_error(esc_html__('Invalid domain', 'h2-product-insight'));
+                return;
+            }
+        }
+
+        $product_id = 0;
+        if (isset($_POST['product_id'])) {
+            $product_id = absint(wp_unslash($_POST['product_id']));
+            if ($product_id > 0 && !wc_get_product($product_id)) {
+                wp_send_json_error(esc_html__('Invalid product ID', 'h2-product-insight'));
+                return;
+            }
+        }
+
         // 5. Create data array with sanitized values
         $initial_data = array(
             'subscription_external_id' => $subscription_id,
@@ -241,44 +270,44 @@ class H2_Product_Insight {
     }
 
     public function send_product_insight_message() {
-        // 1. Nonce check
-        check_ajax_referer('h2_product_insight_nonce', 'nonce');
-    
-        // 2. Validate required fields exist
+        // Verify nonce first
+        if (!check_ajax_referer('h2_product_insight_nonce', 'nonce', false)) {
+            wp_send_json_error(esc_html__('Security check failed.', 'h2-product-insight'));
+            return;
+        }
+
+        // Validate message exists
         if (!isset($_POST['message'])) {
-            wp_send_json_error(H2_Product_Insight_Escaper::escape_translation('Message is required'));
+            wp_send_json_error(esc_html__('Message is required', 'h2-product-insight'));
             return;
         }
-    
-        // 3. Validate and sanitize ALL POST data before using
-        $user_message = sanitize_text_field(H2_Product_Insight_Sanitizer::sanitize_wp_unslash($_POST['message']));
-        
-        // Additional validation for message
+
+        // Sanitize and validate message
+        $user_message = sanitize_text_field(wp_unslash($_POST['message']));
         if (empty($user_message)) {
-            wp_send_json_error(H2_Product_Insight_Escaper::escape_translation('Message cannot be empty'));
+            wp_send_json_error(esc_html__('Message cannot be empty', 'h2-product-insight'));
             return;
         }
-    
-        // Validate message length (optional, based on your requirements)
+
+        // Validate message length
         if (strlen($user_message) > H2_PRODUCT_INSIGHT_MAX_MESSAGE_LENGTH) {
-            wp_send_json_error(H2_Product_Insight_Escaper::escape_translation('Message is too long'));
+            wp_send_json_error(esc_html__('Message is too long', 'h2-product-insight'));
             return;
         }
-        
-        // 4. Validate and sanitize data array
+
+        // Validate and sanitize data array if present
         $initial_data = array();
         if (isset($_POST['data'])) {
-            $raw_data = H2_Product_Insight_Sanitizer::sanitize_wp_unslash($_POST['data']);
-            // Make sure raw_data is valid before sanitizing
+            $raw_data = wp_unslash($_POST['data']);
             if (!empty($raw_data)) {
                 $initial_data = H2_Product_Insight_Sanitizer::sanitize_ai_response($raw_data);
                 if (!$initial_data) {
-                    wp_send_json_error(H2_Product_Insight_Escaper::escape_translation('Invalid data format'));
+                    wp_send_json_error(esc_html__('Invalid data format', 'h2-product-insight'));
                     return;
                 }
             }
         }
-    
+
         // 5. Make API call with sanitized data
         $response = $this->call_ai_api($user_message, $initial_data);
     

@@ -18,7 +18,6 @@ if (!defined('ABSPATH')) {
 
 require_once plugin_dir_path(__FILE__) . './constants.php';
 require_once plugin_dir_path(__FILE__) . './class-h2-product-insight-sanitizer.php';
-require_once plugin_dir_path(__FILE__) . './class-h2-product-insight-escaper.php';
 
 class H2_Product_Insight_Settings {
     private $options;
@@ -406,7 +405,7 @@ class H2_Product_Insight_Settings {
         // send api_key as empty string to get a new key
         $response = wp_remote_post($api_url, array(
             'headers' => array('Content-Type' => 'application/json'),
-            'body'    => wp_json_encode(array('api_key' => '')),
+            'body'    => wp_json_encode(array('api_key' => sanitize_text_field(''))),
             'timeout' => 15,
         ));
 

@@ -25,6 +25,19 @@ jQuery(document).ready(function($) {
         // Serialize form data to include nonce and action
         var formData = $form.serialize();
 
+        // Basic validation before sending
+        var apiKey = $form.find('input[name="api_key"]').val();
+        if (!apiKey || apiKey.length < 10) {
+            $message.text('Invalid API key format').addClass('notice-error').show();
+            return;
+        }
+
+        // Ensure nonce is present
+        if (!$form.find('input[name="_wpnonce"]').val()) {
+            $message.text('Security check failed').addClass('notice-error').show();
+            return;
+        }
+
         $.post(h2_product_insight.ajax_url, formData, function(response) {
             if (response.success) {
                 $message.text(response.data.message).addClass('notice-success').show();

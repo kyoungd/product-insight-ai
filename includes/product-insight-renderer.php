@@ -17,7 +17,6 @@ if (!defined('ABSPATH')) {
 }
 
 require_once plugin_dir_path(__FILE__) . './class-h2-product-insight-sanitizer.php';
-require_once plugin_dir_path(__FILE__) . './class-h2-product-insight-escaper.php';
 
 class H2_Product_Insight_Renderer {
 
