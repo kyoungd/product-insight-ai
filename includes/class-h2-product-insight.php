@@ -141,7 +141,7 @@ class H2_Product_Insight {
 
     public function add_product_insight_tab($tabs) {
         $tabs['product_insight'] = array(
-            'title'    => H2_Product_Insight_Escaper::escape_translation_attribute('Product Insight'),
+            'title'    => esc_html__('Product Insight', 'h2-product-insight'),
             'priority' => 50,
             'callback' => array($this, 'display_chatbox')
         );
@@ -323,7 +323,7 @@ class H2_Product_Insight {
         if (!$ai_response || !isset($ai_response->success) || $ai_response->success !== true) {
             $error_message = isset($ai_response->message) ? 
                 esc_html($ai_response->message) : 
-                H2_Product_Insight_Escaper::escape_translation('Unknown error occurred');
+                esc_html__('Unknown error occurred', 'h2-product-insight');
             wp_send_json_error($error_message);
             return;
         }
@@ -354,14 +354,14 @@ class H2_Product_Insight {
     private function call_ai_api($message, $initial_data) {
         if (empty($this->api_key)) {
             return new WP_Error('api_error', 
-                H2_Product_Insight_Escaper::escape_translation('API Key is not set.')
+                esc_html__('API Key is not set.', 'h2-product-insight')
             );
         }
 
         $url = esc_url(H2_PRODUCT_INSIGHT_API_URL . '/query');
         if (empty($url)) {
             return new WP_Error('invalid_url', 
-                H2_Product_Insight_Escaper::escape_translation('Invalid API URL')
+                esc_html__('Invalid API URL', 'h2-product-insight')
             );
         }
 
