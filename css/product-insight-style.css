@@ -11,7 +11,7 @@
 /* File Name: css/product-insight-style.css */
 
 /* Main chatbox container */
-#product-insight-aichatbox {
+#h2piai-product-insight-aichatbox {
   max-width: 100%;
   margin: 0 auto;
   display: flex;
@@ -21,14 +21,14 @@
 }
 
 /* Input container */
-#product-insight-aichatbox #product-insight-aiinput {
+#h2piai-product-insight-aichatbox #h2piai-product-insight-aiinput {
   display: flex;
   padding: 10px;
   background-color: transparent;
 }
 
 /* User input field */
-#product-insight-aichatbox #product-insight-aiuser-input {
+#h2piai-product-insight-aichatbox #h2piai-product-insight-aiuser-input {
   flex-grow: 1;
   background-color: inherit;
   color: inherit;
@@ -37,25 +37,25 @@
   padding: 10px;
 }
 
-#product-insight-aichatbox #product-insight-aiuser-input::placeholder {
+#h2piai-product-insight-aichatbox #h2piai-product-insight-aiuser-input::placeholder {
   color: inherit;
   opacity: 0.7; /* Slightly dim the placeholder text */
 }
 
-#product-insight-aichatbox #product-insight-aiuser-input:focus {
+#h2piai-product-insight-aichatbox #h2piai-product-insight-aiuser-input:focus {
   outline: none;
   border-color: currentColor;
   box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1); /* Adjust based on theme */
 }
 
-#product-insight-aichatbox #product-insight-aiuser-input:disabled {
+#h2piai-product-insight-aichatbox #h2piai-product-insight-aiuser-input:disabled {
   background-color: inherit;
   cursor: not-allowed;
   opacity: 0.5;
 }
 
 /* Last reply container */
-#product-insight-aichatbox #product-insight-ailast-reply-container {
+#h2piai-product-insight-aichatbox #h2piai-product-insight-ailast-reply-container {
   padding: 5px;
   min-height: min(15vh, 80px);
   overflow-y: auto;
@@ -65,7 +65,7 @@
 }
 
 /* AI message styling */
-#product-insight-aichatbox #product-insight-ailast-reply-container .ai-message {
+#h2piai-product-insight-aichatbox #h2piai-product-insight-ailast-reply-container .h2piai-ai-message {
   width: 100%;
   padding: 8px;
   margin: 4px 0;
@@ -73,7 +73,7 @@
 }
 
 /* Loading indicator */
-#product-insight-aichatbox #product-insight-ailoading {
+#h2piai-product-insight-aichatbox #h2piai-product-insight-ailoading {
   font-style: italic;
   color: inherit;
   text-align: center;
@@ -81,7 +81,7 @@
 }
 
 /* Progress bar styles */
-.progress-bar {
+.h2piai-progress-bar {
   width: 100%;
   height: 4px;
   background-color: #f0f0f0;
@@ -90,15 +90,15 @@
   margin: 10px 0;
 }
 
-.progress {
+.h2piai-progress {
   width: 30%;
   height: 100%;
   background-color: #007bff;
   border-radius: 2px;
-  animation: progress-animation 1.2s infinite ease-in-out;
+  animation: h2piai-progress-animation 1.2s infinite ease-in-out;
 }
 
-@keyframes progress-animation {
+@keyframes h2piai-progress-animation {
   0% {
     transform: translateX(-100%);
   }
@@ -108,12 +108,12 @@
 }
 
 /* Settings page specific styles */
-.h2-input-wrapper {
+.h2piai-input-wrapper {
   position: relative;
   display: inline-block;
 }
 
-.h2-error-indicator {
+.h2piai-error-indicator {
   display: none;
   position: absolute;
   right: -20px;
@@ -125,11 +125,11 @@
   border-radius: 50%;
 }
 
-.h2-input-wrapper.has-error .h2-error-indicator {
+.h2piai-input-wrapper.has-error .h2piai-error-indicator {
   display: block;
 }
 
-.h2-wrap .settings-error {
+.h2piai-wrap .settings-error {
   border-left: 4px solid #dc3232;
   padding: 12px;
   background-color: #fff8f8;
@@ -138,54 +138,53 @@
 
 /* Responsive adjustments */
 @media screen and (max-width: 768px) {
-  #product-insight-aichatbox {
+  #h2piai-product-insight-aichatbox {
     padding: 5px;
   }
   
-  #product-insight-aichatbox #product-insight-aiinput {
+  #h2piai-product-insight-aichatbox #h2piai-product-insight-aiinput {
     padding: 8px;
   }
 }
 
 @media screen and (max-width: 480px) {
-  #product-insight-aichatbox #product-insight-aiuser-input {
+  #h2piai-product-insight-aichatbox #h2piai-product-insight-aiuser-input {
     margin-bottom: 0;
     padding: 8px;
   }
   
-  #product-insight-aichatbox #product-insight-ailast-reply-container {
+  #h2piai-product-insight-aichatbox #h2piai-product-insight-ailast-reply-container {
     min-height: min(12vh, 60px);
     padding: 4px;
   }
   
-  #product-insight-aichatbox #product-insight-ailast-reply-container .ai-message {
+  #h2piai-product-insight-aichatbox #h2piai-product-insight-ailast-reply-container .h2piai-ai-message {
     padding: 4px;
     margin: 2px 0;
   }
   
-  #product-insight-aichatbox #product-insight-ailoading {
+  #h2piai-product-insight-aichatbox #h2piai-product-insight-ailoading {
     margin-top: 8px;
   }
   
-  .progress-bar {
+  .h2piai-progress-bar {
     margin: 8px 0;
   }
 }
 
-
-#h2_activation_message {
+#h2piai-activation-message {
   margin-top: 10px;
   padding: 10px 15px;
   border-radius: 4px;
 }
 
-#h2_activation_message.updated {
+#h2piai-activation-message.updated {
   background-color: #dff0d8;
   border: 1px solid #d6e9c6;
   color: #3c763d;
 }
 
-#h2_activation_message.error {
+#h2piai-activation-message.error {
   background-color: #f2dede;
   border: 1px solid #ebccd1;
   color: #a94442;

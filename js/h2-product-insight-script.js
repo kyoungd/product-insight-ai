@@ -16,9 +16,9 @@ jQuery(document).ready(function($) {
     //     return;
     // }
 
-    const lastReplyContainer = $('#product-insight-ailast-reply-container');
-    const inputContainer = $('#product-insight-aiinput');
-    let userInput = $('#product-insight-aiuser-input');
+    const lastReplyContainer = $('#h2piai-product-insight-ailast-reply-container');
+    const inputContainer = $('#h2piai-product-insight-aiinput');
+    let userInput = $('#h2piai-product-insight-aiuser-input');
     let initialResponse = null;
     let initialCallMade = false;
 
@@ -26,7 +26,7 @@ jQuery(document).ready(function($) {
         if (isAI) {
             lastReplyContainer.empty().append(
                 $('<div>', {
-                    'class': 'ai-message',
+                    'class': 'h2piai-ai-message',
                     'text': message
                 })
             ).show();
@@ -35,13 +35,13 @@ jQuery(document).ready(function($) {
     
     function showProgressBar() {
         console.log('showProgressBar called');
-        inputContainer.html('<div class="progress-bar"><div class="progress"></div></div>');
+        inputContainer.html('<div class="h2piai-progress-bar"><div class="h2piai-progress"></div></div>');
     }
 
     function hideProgressBar() {
         console.log('hideProgressBar called');
-        inputContainer.html('<input type="text" id="product-insight-aiuser-input" placeholder="Ask about the product...">');
-        userInput = $('#product-insight-aiuser-input'); // Reassign the userInput variable
+        inputContainer.html('<input type="text" id="h2piai-product-insight-aiuser-input" placeholder="Ask about the product...">');
+        userInput = $('#h2piai-product-insight-aiuser-input'); // Reassign the userInput variable
         attachInputListeners(); // Reattach event listeners
         userInput.focus(); // Add this line to maintain focus
     }

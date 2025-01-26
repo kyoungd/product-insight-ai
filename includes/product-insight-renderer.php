@@ -45,20 +45,20 @@ class H2_Product_Insight_Renderer {
     private static function render_default_template() {
         ob_start();
         ?>
-        <div id="product-insight-aichatbox">
-            <div id="product-insight-aiinput">
+        <div id="h2piai-product-insight-aichatbox">
+            <div id="h2piai-product-insight-aiinput">
                 <input type="text" 
-                       id="product-insight-aiuser-input" 
+                       id="h2piai-product-insight-aiuser-input" 
                        placeholder="<?php echo esc_attr__('Ask about the product...', 'h2-product-insight'); ?>" 
                        aria-label="<?php echo esc_attr__('Chat Input', 'h2-product-insight'); ?>"
                        maxlength="1000"
                        pattern="[^<>]*"
                 >
-                <div id="product-insight-ailoading" style="display: none;">
+                <div id="h2piai-product-insight-ailoading" style="display: none;">
                     <?php echo esc_html__('Initializing...', 'h2-product-insight'); ?>
                 </div>
             </div>
-            <div id="product-insight-ailast-reply-container" style="display: none;"></div>
+            <div id="h2piai-product-insight-ailast-reply-container" style="display: none;"></div>
             <div id="product-insight-aimessages"></div>
         </div>
         <?php

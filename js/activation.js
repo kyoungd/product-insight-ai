@@ -15,7 +15,7 @@ jQuery(document).ready(function($) {
 
         var $form = $(this);
         var $button = $form.find('#h2_activate_button');
-        var $message = $('#h2_activation_message');
+        var $message = $('#h2piai-activation-message');
         var $spinner = $button.find('.spinner');
         
         $button.prop('disabled', true);

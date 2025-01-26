@@ -243,7 +243,7 @@ class H2_Product_Insight_Settings {
     public function render_settings_page() {
         $this->options = get_option('h2_product_insight_options', array());
         ?>
-        <div class="h2-wrap">
+        <div class="h2piai-wrap">
             <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
             <p>
                 <a href="<?php echo esc_url('https://2human.ai/product-insight'); ?>" target="_blank">
@@ -260,7 +260,7 @@ class H2_Product_Insight_Settings {
                         <span class="spinner" style="display:none;"></span>
                     </button>
                 </form>
-                <div id="h2_activation_message" class="notice" style="display:none;"></div>
+                <div id="h2piai-activation-message" class="notice" style="display:none;"></div>
             <?php else : ?>
                 <form action="<?php echo esc_url(admin_url('options.php')); ?>" method="post">
                 <?php
@@ -291,7 +291,7 @@ class H2_Product_Insight_Settings {
         $error_class = in_array('api_key', $this->invalid_fields) ? 'has-error' : '';
         
         printf(
-            '<div class="h2-input-wrapper %s">',
+            '<div class="h2piai-input-wrapper %s">',
             esc_attr($error_class)
         );
         
@@ -301,7 +301,7 @@ class H2_Product_Insight_Settings {
             esc_attr__('API Key', 'h2-product-insight')
         );
         
-        echo '<span class="h2-error-indicator"></span>';
+        echo '<span class="h2piai-error-indicator"></span>';
         echo '</div>';
     }
     
