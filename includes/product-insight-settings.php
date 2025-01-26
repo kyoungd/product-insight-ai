@@ -19,7 +19,7 @@ if (!defined('ABSPATH')) {
 require_once plugin_dir_path(__FILE__) . './constants.php';
 require_once plugin_dir_path(__FILE__) . './class-h2-product-insight-sanitizer.php';
 
-class H2_Product_Insight_Settings {
+class H2PIAI_Product_Insight_Settings {
     private $options;
     private $invalid_fields = array();
 

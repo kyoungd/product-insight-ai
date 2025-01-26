@@ -23,11 +23,11 @@ require_once plugin_dir_path(__FILE__) . './class-h2-product-insight-sanitizer.p
 /**
  * Main plugin class
  *
- * @package    H2_Product_Insight
+ * @package    H2PIAI_Product_Insight_Main
  * @subpackage Classes
  * @since      1.0.0
  */
-class H2_Product_Insight {
+class H2PIAI_Product_Insight_Main {
 
     private $settings;
     private $api_key;
@@ -35,7 +35,7 @@ class H2_Product_Insight {
 
     public function __construct() {
         // Settings class initialization
-        $this->settings = new H2_Product_Insight_Settings();
+        $this->settings = new H2PIAI_Product_Insight_Settings();
         add_action('init', array($this, 'init'));
 
         // AJAX action hooks
@@ -159,7 +159,7 @@ class H2_Product_Insight {
             $this->enqueue_scripts();
         }
         
-        return H2_Product_Insight_Renderer::render();
+        return H2PIAI_Product_Insight_Renderer::render();
     }
 
     public function handle_initial_call() {
