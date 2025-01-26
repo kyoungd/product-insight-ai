@@ -10,7 +10,7 @@
  */
 
 jQuery(document).ready(function($) {
-    $('#h2piai-activate-product-insight').on('submit', function(e) {
+    $('#h2piai_activate_product_insight').on('submit', function(e) {
         e.preventDefault();
 
         var $form = $(this);

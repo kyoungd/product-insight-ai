@@ -17,7 +17,7 @@ if (!defined('WP_UNINSTALL_PLUGIN')) {
 }
 
 // Delete plugin options
-delete_option('h2_product_insight_options');
-delete_option('h2_product_insight_invalid_fields');
+delete_option('h2piai_product_insight_options');
+delete_option('h2piai_product_insight_invalid_fields');
 
 // Clean up any additional options and custom tables if necessary

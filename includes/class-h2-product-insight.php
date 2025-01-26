@@ -69,7 +69,7 @@ class H2PIAI_Product_Insight_Main {
     }
 
     public function init() {
-        $options = get_option('h2_product_insight_options', array()); // Added default array value
+        $options = get_option('h2piai_product_insight_options', array()); // Added default array value
         $this->api_key = isset($options['api_key']) ? sanitize_text_field($options['api_key']) : '';
     }
 
@@ -96,7 +96,7 @@ class H2PIAI_Product_Insight_Main {
         ));
 
         // Add custom CSS if it exists
-        $options = get_option('h2_product_insight_options', array());
+        $options = get_option('h2piai_product_insight_options', array());
         if (!empty($options['custom_css'])) {
             $custom_css = H2PIAI_Product_Insight_Sanitizer::sanitize_custom_css($options['custom_css']);
             wp_add_inline_style('product-insight-style', $custom_css);
@@ -104,7 +104,7 @@ class H2PIAI_Product_Insight_Main {
     }
 
     public function add_chatbox_display_hook() {
-        $options   = get_option('h2_product_insight_options');
+        $options   = get_option('h2piai_product_insight_options');
         $placement = isset($options['chatbox_placement']) ? $options['chatbox_placement'] : 'after_add_to_cart';
 
         switch ($placement) {

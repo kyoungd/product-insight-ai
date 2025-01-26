@@ -28,14 +28,14 @@ class H2PIAI_Product_Insight_Settings {
         add_action('admin_init', array($this, 'init_settings'));
 
         // Retrieve invalid fields from the previous submission
-        $this->invalid_fields = get_option('h2_product_insight_invalid_fields', array());
+        $this->invalid_fields = get_option('h2piai_product_insight_invalid_fields', array());
 
         // Enqueue the custom CSS and scripts for the settings page
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_styles'));
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_scripts'));
 
         // AJAX handler for activation
-        add_action('wp_ajax_h2_activate_product_insight', array($this, 'handle_activate_product_insight'));
+        add_action('wp_ajax_h2piai_activate_product_insight', array($this, 'handle_activate_product_insight'));
     }
 
     public function enqueue_admin_scripts($hook) {
@@ -56,7 +56,7 @@ class H2PIAI_Product_Insight_Settings {
         wp_localize_script('h2_product_insight_admin_js', 'h2piai_product_insight', array(
             'ajax_url' => esc_url(admin_url('admin-ajax.php')),
             'api_url'  => esc_url(H2PIAI_PRODUCT_INSIGHT_API_URL),
-            'nonce'    => wp_create_nonce('h2_activate_product_insight_nonce')
+            'nonce'    => wp_create_nonce('h2piai_activate_product_insight_nonce')
         ));
     }
 
@@ -94,7 +94,7 @@ class H2PIAI_Product_Insight_Settings {
      * Initializes the plugin settings.
      */
     public function init_settings() {
-        register_setting('h2_product_insight_settings', 'h2_product_insight_options', array($this, 'sanitize'));
+        register_setting('h2_product_insight_settings', 'h2piai_product_insight_options', array($this, 'sanitize'));
 
         add_settings_section(
             'h2_product_insight_general_section',
@@ -138,7 +138,7 @@ class H2PIAI_Product_Insight_Settings {
 
         $sanitized_input = array();
         $this->invalid_fields = array(); 
-        $existing_options = get_option('h2_product_insight_options', array());
+        $existing_options = get_option('h2piai_product_insight_options', array());
 
         // Sanitize API Key
         if (isset($input['api_key']) && !empty($input['api_key'])) {
@@ -156,7 +156,7 @@ class H2PIAI_Product_Insight_Settings {
 
         // If any required fields are missing, retain existing values and stop validation
         if (!empty($this->invalid_fields)) {
-            update_option('h2_product_insight_invalid_fields', $this->invalid_fields);
+            update_option('h2piai_product_insight_invalid_fields', $this->invalid_fields);
             return array_merge($existing_options, $sanitized_input);
         }
 
@@ -231,7 +231,7 @@ class H2PIAI_Product_Insight_Settings {
         }
 
         // Update invalid fields option for styling
-        update_option('h2_product_insight_invalid_fields', $this->invalid_fields);
+        update_option('h2piai_product_insight_invalid_fields', $this->invalid_fields);
 
         // Return merged array to preserve any existing options not included in current update
         return array_merge($existing_options, $sanitized_input);
@@ -241,7 +241,7 @@ class H2PIAI_Product_Insight_Settings {
      * Renders the settings page.
      */
     public function render_settings_page() {
-        $this->options = get_option('h2_product_insight_options', array());
+        $this->options = get_option('h2piai_product_insight_options', array());
         ?>
         <div class="h2piai-wrap">
             <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
@@ -252,9 +252,9 @@ class H2PIAI_Product_Insight_Settings {
             </p>
             
             <?php if (H2PIAI_ACTIVATION_TEST || empty($this->options['api_key'])) : ?>
-                <form id="h2piai-activate-product-insight" action="<?php echo esc_url(admin_url('admin-ajax.php')); ?>" method="post">
-                    <?php wp_nonce_field('h2_activate_product_insight_nonce', 'nonce'); ?>
-                    <input type="hidden" name="action" value="h2piai-activate-product-insight" />
+                <form id="h2piai_activate_product_insight" action="<?php echo esc_url(admin_url('admin-ajax.php')); ?>" method="post">
+                    <?php wp_nonce_field('h2piai_activate_product_insight_nonce', 'nonce'); ?>
+                    <input type="hidden" name="action" value="h2piai_activate_product_insight" />
                     <button type="submit" class="button button-primary" id="h2_activate_button">
                         <?php echo esc_html__('Activate Product Insight AI', 'h2-product-insight'); ?>
                         <span class="spinner" style="display:none;"></span>
@@ -276,7 +276,7 @@ class H2PIAI_Product_Insight_Settings {
         settings_errors('h2_product_insight_settings');
 
         // Delete invalid fields option after rendering
-        delete_option('h2_product_insight_invalid_fields');
+        delete_option('h2piai_product_insight_invalid_fields');
     }
 
     /**
@@ -296,7 +296,7 @@ class H2PIAI_Product_Insight_Settings {
         );
         
         printf(
-            '<input type="text" id="api_key" name="h2_product_insight_options[api_key]" value="%s" class="regular-text" aria-label="%s">',
+            '<input type="text" id="api_key" name="h2piai_product_insight_options[api_key]" value="%s" class="regular-text" aria-label="%s">',
             esc_attr($value),
             esc_attr__('API Key', 'h2-product-insight')
         );
@@ -356,7 +356,7 @@ class H2PIAI_Product_Insight_Settings {
             'product_sidebar' => esc_html__('In Product Sidebar', 'h2-product-insight')
         );
         
-        echo '<select id="chatbox_placement" name="h2_product_insight_options[chatbox_placement]">';
+        echo '<select id="chatbox_placement" name="h2piai_product_insight_options[chatbox_placement]">';
         foreach ($options as $key => $label) {
             printf(
                 '<option value="%s" %s>%s</option>',
@@ -376,7 +376,7 @@ class H2PIAI_Product_Insight_Settings {
     public function render_custom_css_field() {
         $value = isset($this->options['custom_css']) ? $this->options['custom_css'] : '';
         printf(
-            '<textarea id="custom_css" name="h2_product_insight_options[custom_css]" rows="10" cols="50" class="large-text code">%s</textarea>',
+            '<textarea id="custom_css" name="h2piai_product_insight_options[custom_css]" rows="10" cols="50" class="large-text code">%s</textarea>',
             esc_textarea($value)
         );
         echo '<p class="description">' . esc_html__('Enter any custom CSS to style the chatbox.', 'h2-product-insight') . '</p>';
@@ -389,7 +389,7 @@ class H2PIAI_Product_Insight_Settings {
      * Handles the activation of Product Insight AI via AJAX.
      */
     public function handle_activate_product_insight() {
-        check_ajax_referer('h2_activate_product_insight_nonce', 'nonce');
+        check_ajax_referer('h2piai_activate_product_insight_nonce', 'nonce');
 
         if (!current_user_can('manage_options')) {
             wp_send_json_error(array('message' => esc_html__('Permission denied.', 'h2-product-insight')));
@@ -433,14 +433,14 @@ class H2PIAI_Product_Insight_Settings {
         );
 
         // Delete existing option first
-        delete_option('h2_product_insight_options');
+        delete_option('h2piai_product_insight_options');
         
         // Add new option
-        $update_success = add_option('h2_product_insight_options', $options);
+        $update_success = add_option('h2piai_product_insight_options', $options);
         
         if (!$update_success) {
             // If add_option failed, try update_option
-            $update_success = update_option('h2_product_insight_options', $options, false);
+            $update_success = update_option('h2piai_product_insight_options', $options, false);
         }
 
         if ($update_success && isset($options['api_key']) && !empty($options['api_key'])) {
