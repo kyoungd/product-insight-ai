@@ -10,7 +10,7 @@
  */
 
 jQuery(document).ready(function($) {
-    $('#h2_activate_product_insight').on('submit', function(e) {
+    $('#h2piai-activate-product-insight').on('submit', function(e) {
         e.preventDefault();
 
         var $form = $(this);
@@ -38,7 +38,7 @@ jQuery(document).ready(function($) {
             return;
         }
 
-        $.post(h2_product_insight.ajax_url, formData, function(response) {
+        $.post(h2piai_product_insight.ajax_url, formData, function(response) {
             if (response.success) {
                 $message.text(response.data.message).addClass('notice-success').show();
                 setTimeout(function() {

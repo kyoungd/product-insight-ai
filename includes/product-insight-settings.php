@@ -53,7 +53,7 @@ class H2_Product_Insight_Settings {
         );
 
         // Localize script to pass AJAX URL and nonce
-        wp_localize_script('h2_product_insight_admin_js', 'h2_product_insight', array(
+        wp_localize_script('h2_product_insight_admin_js', 'h2piai_product_insight', array(
             'ajax_url' => esc_url(admin_url('admin-ajax.php')),
             'api_url'  => esc_url(H2PIAI_PRODUCT_INSIGHT_API_URL),
             'nonce'    => wp_create_nonce('h2_activate_product_insight_nonce')
@@ -85,7 +85,7 @@ class H2_Product_Insight_Settings {
             esc_attr__('H2 Product Insight Settings', 'h2-product-insight'), 
             esc_attr__('H2 Product Insight', 'h2-product-insight'),         
             'manage_options',                                       
-            'h2_product_insight',                                   
+            'h2piai_product_insight',                                   
             array($this, 'render_settings_page')                   
         );
     }
@@ -252,9 +252,9 @@ class H2_Product_Insight_Settings {
             </p>
             
             <?php if (H2PIAI_ACTIVATION_TEST || empty($this->options['api_key'])) : ?>
-                <form id="h2_activate_product_insight" action="<?php echo esc_url(admin_url('admin-ajax.php')); ?>" method="post">
+                <form id="h2piai-activate-product-insight" action="<?php echo esc_url(admin_url('admin-ajax.php')); ?>" method="post">
                     <?php wp_nonce_field('h2_activate_product_insight_nonce', 'nonce'); ?>
-                    <input type="hidden" name="action" value="h2_activate_product_insight" />
+                    <input type="hidden" name="action" value="h2piai-activate-product-insight" />
                     <button type="submit" class="button button-primary" id="h2_activate_button">
                         <?php echo esc_html__('Activate Product Insight AI', 'h2-product-insight'); ?>
                         <span class="spinner" style="display:none;"></span>

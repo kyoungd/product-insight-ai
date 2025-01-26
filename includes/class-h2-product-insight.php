@@ -48,7 +48,7 @@ class H2_Product_Insight {
         add_action('init', array($this, 'add_chatbox_display_hook'));
 
         // Add shortcode registration
-        add_shortcode('h2_product_insight', array($this, 'handle_shortcode'));
+        add_shortcode('h2piai_product_insight', array($this, 'handle_shortcode'));
 
         // Enqueue scripts and styles
         add_action('wp_enqueue_scripts', array($this, 'enqueue_scripts'));

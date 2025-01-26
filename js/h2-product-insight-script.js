@@ -16,15 +16,15 @@ jQuery(document).ready(function($) {
     //     return;
     // }
 
-    const lastReplyContainer = $('#h2piai-product-insight-ailast-reply-container');
-    const inputContainer = $('#h2piai-product-insight-aiinput');
-    let userInput = $('#h2piai-product-insight-aiuser-input');
-    let initialResponse = null;
-    let initialCallMade = false;
+    const h2piai_lastReplyContainer = $('#h2piai-product-insight-ailast-reply-container');
+    const h2piai_inputContainer = $('#h2piai-product-insight-aiinput');
+    let h2piai_userInput = $('#h2piai-product-insight-aiuser-input');
+    let h2piai_initialResponse = null;
+    let h2piai_initialCallMade = false;
 
-    function addMessage(message, isAI = false) {
+    function h2piai_addMessage(message, isAI = false) {
         if (isAI) {
-            lastReplyContainer.empty().append(
+            h2piai_lastReplyContainer.empty().append(
                 $('<div>', {
                     'class': 'h2piai-ai-message',
                     'text': message
@@ -33,22 +33,22 @@ jQuery(document).ready(function($) {
         }
     }
     
-    function showProgressBar() {
-        console.log('showProgressBar called');
-        inputContainer.html('<div class="h2piai-progress-bar"><div class="h2piai-progress"></div></div>');
+    function h2piai_showProgressBar() {
+        console.log('h2piai_showProgressBar called');
+        h2piai_inputContainer.html('<div class="h2piai-progress-bar"><div class="h2piai-progress"></div></div>');
     }
 
-    function hideProgressBar() {
-        console.log('hideProgressBar called');
-        inputContainer.html('<input type="text" id="h2piai-product-insight-aiuser-input" placeholder="Ask about the product...">');
-        userInput = $('#h2piai-product-insight-aiuser-input'); // Reassign the userInput variable
-        attachInputListeners(); // Reattach event listeners
-        userInput.focus(); // Add this line to maintain focus
+    function h2piai_hideProgressBar() {
+        console.log('h2piai_hideProgressBar called');
+        h2piai_inputContainer.html('<input type="text" id="h2piai-product-insight-aiuser-input" placeholder="Ask about the product...">');
+        h2piai_userInput = $('#h2piai-product-insight-aiuser-input'); // Reassign the h2piai_userInput variable
+        h2piai_attachInputListeners(); // Reattach event listeners
+        h2piai_userInput.focus(); // Add this line to maintain focus
     }
 
-    function makeInitialCall() {
-        console.log('makeInitialCall called');
-        showProgressBar();
+    function h2piai_makeInitialCall() {
+        console.log('h2piai_makeInitialCall called');
+        h2piai_showProgressBar();
         $.ajax({
             url: h2_product_insight_ajax.ajax_url,
             type: 'POST',
@@ -61,51 +61,51 @@ jQuery(document).ready(function($) {
                 caller_domain: window.location.hostname // Add this line
             },
             success: function(response) {
-                hideProgressBar();
+                h2piai_hideProgressBar();
                 if (response.success) {
-                    initialResponse = response.data.data;
-                    console.log('Initial call successful:', initialResponse);
-                    initialCallMade = true;
+                    h2piai_initialResponse = response.data.data;
+                    console.log('Initial call successful:', h2piai_initialResponse);
+                    h2piai_initialCallMade = true;
                 } else {
                     console.error('Initial call failed:', response.data);
-                    addMessage('Error initializing chat. Please try again later.', true);
+                    h2piai_addMessage('Error initializing chat. Please try again later.', true);
                 }
             },
             error: function(xhr, status, error) {
-                hideProgressBar();
+                h2piai_hideProgressBar();
                 console.error('Error making initial call:', error);
-                addMessage('Error initializing chat. Please try again later.', true);
+                h2piai_addMessage('Error initializing chat. Please try again later.', true);
             }
         });
     }
 
-    function sendMessage() {
-        const message = userInput.val().trim();
+    function h2piai_sendMessage() {
+        const message = h2piai_userInput.val().trim();
         if (message === '') return;
 
-        userInput.val('');
-        showProgressBar();
+        h2piai_userInput.val('');
+        h2piai_showProgressBar();
 
-        if (initialResponse === null) {
-            addMessage('Please wait, initializing chat...', true);
+        if (h2piai_initialResponse === null) {
+            h2piai_addMessage('Please wait, initializing chat...', true);
             let checkInitialResponse = setInterval(function() {
-                if (initialResponse !== null) {
+                if (h2piai_initialResponse !== null) {
                     clearInterval(checkInitialResponse);
-                    proceedWithMessage(message);
+                    h2piai_proceedWithMessage(message);
                 }
             }, 100);
         } else {
-            proceedWithMessage(message);
+            h2piai_proceedWithMessage(message);
         }
     }
 
-    function proceedWithMessage(message) {
+    function h2piai_proceedWithMessage(message) {
         // Basic client-side sanitization
         message = message.replace(/[<>]/g, '').trim().substring(0, 1000);
         
         // Add data validation before sending
         if (!message || !h2_product_insight_ajax.nonce) {
-            addMessage('Invalid input data', true);
+            h2piai_addMessage('Invalid input data', true);
             return;
         }
 
@@ -116,39 +116,39 @@ jQuery(document).ready(function($) {
                 action: 'send_product_insight_message',
                 nonce: h2_product_insight_ajax.nonce,
                 message: message,
-                data: initialResponse
+                data: h2piai_initialResponse
             },
             success: function(response) {
-                hideProgressBar();
+                h2piai_hideProgressBar();
                 if (response.success) {
-                    initialResponse = response.data.data;
-                    addMessage(initialResponse.message, true);
+                    h2piai_initialResponse = response.data.data;
+                    h2piai_addMessage(h2piai_initialResponse.message, true);
                 } else {
-                    addMessage('Error: ' + response.data, true);
+                    h2piai_addMessage('Error: ' + response.data, true);
                 }
             },
             error: function() {
-                hideProgressBar();
-                addMessage('Error communicating with the server', true);
+                h2piai_hideProgressBar();
+                h2piai_addMessage('Error communicating with the server', true);
             }
         });
     }
 
-    function attachInputListeners() {
-        console.log('attachInputListeners called');
-        userInput.on('keypress', function(e) {
+    function h2piai_attachInputListeners() {
+        console.log('h2piai_attachInputListeners called');
+        h2piai_userInput.on('keypress', function(e) {
             if (e.which === 13) {
-                sendMessage();
+                h2piai_sendMessage();
             }
         });
 
-        userInput.one('focus', function() {
-            if (!initialCallMade) {
+        h2piai_userInput.one('focus', function() {
+            if (!h2piai_initialCallMade) {
                 console.log('Input field focused. Making initial AI call.');
-                makeInitialCall();
+                h2piai_makeInitialCall();
             }
         });
     }
 
-    hideProgressBar();
+    h2piai_hideProgressBar();
 });
