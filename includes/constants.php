@@ -16,15 +16,15 @@ if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
 
-define('H2_ACTIVATION_TEST', false);
-define('H2_PRODUCT_INSIGHT_VERSION', '1.4');
-define('H2_PRODUCT_INSIGHT_API_URL', 'https://2human.ai/wp-json/my-first-plugin/v1');
-# define('H2_PRODUCT_INSIGHT_API_URL', 'https://talkee.ai/wp-json/my-first-plugin/v1');
+define('H2PIAI_ACTIVATION_TEST', false);
+define('H2PIAI_PRODUCT_INSIGHT_VERSION', '1.4');
+define('H2PIAI_PRODUCT_INSIGHT_API_URL', 'https://2human.ai/wp-json/my-first-plugin/v1');
+# define('H2PIAI_PRODUCT_INSIGHT_API_URL', 'https://talkee.ai/wp-json/my-first-plugin/v1');
 
-define('H2_PRODUCT_INSIGHT_MAX_MESSAGE_LENGTH', 1000);
-define('H2_PRODUCT_INSIGHT_MAX_QUERY_LENGTH', 2000);
+define('H2PIAI_PRODUCT_INSIGHT_MAX_MESSAGE_LENGTH', 1000);
+define('H2PIAI_PRODUCT_INSIGHT_MAX_QUERY_LENGTH', 2000);
 
-define('H2_PRODUCT_INSIGHT_SECURITY_PATTERNS', array(
+define('H2PIAI_PRODUCT_INSIGHT_SECURITY_PATTERNS', array(
     '/\\<script\\b[^>]*\\>.*?\\<\\/script\\>/is',  // Remove <script> tags (escaped)
     '/\\<iframe\\b[^>]*\\>.*?\\<\\/iframe\\>/is',  // Remove <iframe> tags (escaped)
     '/on\\w+\\s*=\\s*".*?"/is',                    // Remove inline event handlers in double quotes
@@ -32,7 +32,7 @@ define('H2_PRODUCT_INSIGHT_SECURITY_PATTERNS', array(
     '/on\\w+\\s*=\\s*\\w+/is',                     // Remove inline event handlers without quotes
 ));
 
-define('H2_PRODUCT_INSIGHT_INVALID_INPUTS', array(
+define('H2PIAI_PRODUCT_INSIGHT_INVALID_INPUTS', array(
     '/<\?php/i',                         // PHP tags
     '/<\?=/i',                           // Short open tags
     '/\<\%.+?\%\>/s',                    // ASP-style tags
@@ -41,7 +41,7 @@ define('H2_PRODUCT_INSIGHT_INVALID_INPUTS', array(
 ));
 
 
-define('H2_PRODUCT_INSIGHT_ALLOWED_HTML_TAGS', array(
+define('H2PIAI_PRODUCT_INSIGHT_ALLOWED_HTML_TAGS', array(
     // Text formatting
     'p'      => array(
         'class' => array(),
@@ -192,7 +192,7 @@ define('H2_PRODUCT_INSIGHT_ALLOWED_HTML_TAGS', array(
 
 
 // Strict tags for user inputs and sensitive contexts
-define('H2_PRODUCT_INSIGHT_ALLOWED_TAGS_STRICT', array(
+define('H2PIAI_PRODUCT_INSIGHT_ALLOWED_TAGS_STRICT', array(
     'p'      => array(),
     'br'     => array(),
     'strong' => array(),

@@ -48,14 +48,14 @@ class H2_Product_Insight_Settings {
         wp_enqueue_script('h2_product_insight_admin_js', 
             plugins_url('../js/activation.js', __FILE__), 
             array('jquery'), 
-            H2_PRODUCT_INSIGHT_VERSION, 
+            H2PIAI_PRODUCT_INSIGHT_VERSION, 
             true 
         );
 
         // Localize script to pass AJAX URL and nonce
         wp_localize_script('h2_product_insight_admin_js', 'h2_product_insight', array(
             'ajax_url' => esc_url(admin_url('admin-ajax.php')),
-            'api_url'  => esc_url(H2_PRODUCT_INSIGHT_API_URL),
+            'api_url'  => esc_url(H2PIAI_PRODUCT_INSIGHT_API_URL),
             'nonce'    => wp_create_nonce('h2_activate_product_insight_nonce')
         ));
     }
@@ -73,7 +73,7 @@ class H2_Product_Insight_Settings {
             'h2_product_insight_admin_css', 
             plugins_url('../css/product-insight-style.css', __FILE__),
             array(),
-            H2_PRODUCT_INSIGHT_VERSION
+            H2PIAI_PRODUCT_INSIGHT_VERSION
         );        
     }
 
@@ -161,7 +161,7 @@ class H2_Product_Insight_Settings {
         }
 
         // Use direct concatenation for API endpoints
-        $response = wp_remote_post(H2_PRODUCT_INSIGHT_API_URL . '/validate-api-key', array(
+        $response = wp_remote_post(H2PIAI_PRODUCT_INSIGHT_API_URL . '/validate-api-key', array(
             'headers' => array('Content-Type' => 'application/json'),
             'body'    => wp_json_encode(array('api_key' => $sanitized_input['api_key'])),
             'timeout' => 15,
@@ -214,7 +214,7 @@ class H2_Product_Insight_Settings {
 
         // Sanitize custom CSS using dedicated sanitizer
         if (isset($input['custom_css'])) {
-            $sanitized_input['custom_css'] = H2_Product_Insight_Sanitizer::sanitize_custom_css($input['custom_css']);
+            $sanitized_input['custom_css'] = H2PIAI_Product_Insight_Sanitizer::sanitize_custom_css($input['custom_css']);
         } else {
             $sanitized_input['custom_css'] = isset($existing_options['custom_css']) 
                 ? $existing_options['custom_css'] 
@@ -251,7 +251,7 @@ class H2_Product_Insight_Settings {
                 </a>
             </p>
             
-            <?php if (H2_ACTIVATION_TEST || empty($this->options['api_key'])) : ?>
+            <?php if (H2PIAI_ACTIVATION_TEST || empty($this->options['api_key'])) : ?>
                 <form id="h2_activate_product_insight" action="<?php echo esc_url(admin_url('admin-ajax.php')); ?>" method="post">
                     <?php wp_nonce_field('h2_activate_product_insight_nonce', 'nonce'); ?>
                     <input type="hidden" name="action" value="h2_activate_product_insight" />
@@ -396,7 +396,7 @@ class H2_Product_Insight_Settings {
             return;
         }
 
-        $api_url = esc_url_raw(H2_PRODUCT_INSIGHT_API_URL . '/new-registration');
+        $api_url = esc_url_raw(H2PIAI_PRODUCT_INSIGHT_API_URL . '/new-registration');
         if (empty($api_url)) {
             wp_send_json_error(array('message' => esc_html__('Invalid API URL.', 'h2-product-insight')));
             return;
