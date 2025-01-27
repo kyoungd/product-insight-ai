@@ -12,7 +12,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-class H2PIAI_Product_Insight_Sanitizer {
+class h2piai_Product_Insight_Sanitizer {
 
     public static function sanitize_custom_css( $css ) {
         if ( empty( $css ) ) {
@@ -37,7 +37,7 @@ class H2PIAI_Product_Insight_Sanitizer {
         }, $css );
 
         // Step 4: Limit the length
-        $css = substr( $css, 0, H2PIAI_PRODUCT_INSIGHT_MAX_QUERY_LENGTH );
+        $css = substr( $css, 0, h2piai_PRODUCT_INSIGHT_MAX_QUERY_LENGTH );
 
         // Step 5: Trim whitespace
         $css = trim( $css );
@@ -134,6 +134,6 @@ class H2PIAI_Product_Insight_Sanitizer {
     }
 
     public static function sanitize_wp_unslash($input) {
-        return H2PIAI_Product_Insight_Sanitizer::should_wp_unslash($input) ? wp_unslash($input) : $input;
+        return h2piai_Product_Insight_Sanitizer::should_wp_unslash($input) ? wp_unslash($input) : $input;
     }
 }
