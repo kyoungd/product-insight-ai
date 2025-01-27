@@ -37,7 +37,7 @@ require_once plugin_dir_path(__FILE__) . 'includes/class-h2-product-insight-sani
 // Initialize the plugin
 function h2piai_product_insight_initialization() {
     load_plugin_textdomain('h2-product-insight', false, dirname(plugin_basename(__FILE__)) . '/languages/');
-    new H2PIAI_Product_Insight_Main();
+    new h2piai_Product_Insight_Main();
 }
 add_action('plugins_loaded', 'h2piai_product_insight_initialization');
 
