@@ -18,7 +18,7 @@ if (!defined('ABSPATH')) {
 
 require_once plugin_dir_path(__FILE__) . './class-h2-product-insight-sanitizer.php';
 
-class h2piai_Product_Insight_Renderer {
+class H2PIAI_Product_Insight_Renderer {
 
     /**
      * Renders the chatbox based on the custom or default template.

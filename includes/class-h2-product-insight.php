@@ -23,11 +23,11 @@ require_once plugin_dir_path(__FILE__) . './class-h2-product-insight-sanitizer.p
 /**
  * Main plugin class
  *
- * @package    h2piai_Product_Insight_Main
+ * @package    H2PIAI_Product_Insight_Main
  * @subpackage Classes
  * @since      1.0.0
  */
-class h2piai_Product_Insight_Main {
+class H2PIAI_Product_Insight_Main {
 
     private $settings;
     private $api_key;
@@ -35,7 +35,7 @@ class h2piai_Product_Insight_Main {
 
     public function __construct() {
         // Settings class initialization
-        $this->settings = new h2piai_Product_Insight_Settings();
+        $this->settings = new H2PIAI_Product_Insight_Settings();
         add_action('init', array($this, 'init'));
 
         // AJAX action hooks
@@ -79,13 +79,13 @@ class h2piai_Product_Insight_Main {
             'product-insight-style',
             plugin_dir_url(__FILE__) . '../css/product-insight-style.css',
             array(),
-            h2piai_PRODUCT_INSIGHT_VERSION  // Updated to use constant
+            H2PIAI_PRODUCT_INSIGHT_VERSION  // Updated to use constant
         );
         wp_enqueue_script(
             'h2-product-insight-script',
             plugin_dir_url(__FILE__) . '../js/h2-product-insight-script.js',
             array('jquery'),
-            h2piai_PRODUCT_INSIGHT_VERSION,  // Updated to use constant
+            H2PIAI_PRODUCT_INSIGHT_VERSION,  // Updated to use constant
             true
         );
         wp_localize_script('h2-product-insight-script', 'h2_product_insight_ajax', array(
@@ -98,7 +98,7 @@ class h2piai_Product_Insight_Main {
         // Add custom CSS if it exists
         $options = get_option('h2piai_product_insight_options', array());
         if (!empty($options['custom_css'])) {
-            $custom_css = h2piai_Product_Insight_Sanitizer::sanitize_custom_css($options['custom_css']);
+            $custom_css = H2PIAI_Product_Insight_Sanitizer::sanitize_custom_css($options['custom_css']);
             wp_add_inline_style('product-insight-style', $custom_css);
         }
     }
@@ -159,7 +159,7 @@ class h2piai_Product_Insight_Main {
             $this->enqueue_scripts();
         }
         
-        return h2piai_Product_Insight_Renderer::render();
+        return H2PIAI_Product_Insight_Renderer::render();
     }
 
     public function h2piai_handle_initial_call() {
@@ -242,8 +242,8 @@ class h2piai_Product_Insight_Main {
             return;
         }
     
-        $raw_data = h2piai_Product_Insight_Sanitizer::sanitize_wp_unslash($response['body']);  // Unslash before sanitization
-        $ai_response = h2piai_Product_Insight_Sanitizer::sanitize_ai_response($raw_data);
+        $raw_data = H2PIAI_Product_Insight_Sanitizer::sanitize_wp_unslash($response['body']);  // Unslash before sanitization
+        $ai_response = H2PIAI_Product_Insight_Sanitizer::sanitize_ai_response($raw_data);
         if (!$ai_response || !isset($ai_response->success) || $ai_response->success !== true) {
             $error_message = isset($ai_response->message) ? 
                 esc_html($ai_response->message) : 
@@ -290,7 +290,7 @@ class h2piai_Product_Insight_Main {
         }
 
         // Validate message length
-        if (strlen($user_message) > h2piai_PRODUCT_INSIGHT_MAX_MESSAGE_LENGTH) {
+        if (strlen($user_message) > H2PIAI_PRODUCT_INSIGHT_MAX_MESSAGE_LENGTH) {
             wp_send_json_error(esc_html__('Message is too long', 'h2-product-insight'));
             return;
         }
@@ -300,7 +300,7 @@ class h2piai_Product_Insight_Main {
         if (isset($_POST['data'])) {
             $raw_data = wp_unslash($_POST['data']);
             if (!empty($raw_data)) {
-                $initial_data = h2piai_Product_Insight_Sanitizer::sanitize_ai_response($raw_data);
+                $initial_data = H2PIAI_Product_Insight_Sanitizer::sanitize_ai_response($raw_data);
                 if (!$initial_data) {
                     wp_send_json_error(esc_html__('Invalid data format', 'h2-product-insight'));
                     return;
@@ -317,8 +317,8 @@ class h2piai_Product_Insight_Main {
         }
     
         // 6. Sanitize API response
-        $raw_response = h2piai_Product_Insight_Sanitizer::sanitize_wp_unslash($response['body']);  // Unslash before sanitization
-        $ai_response = h2piai_Product_Insight_Sanitizer::sanitize_ai_response($raw_response);
+        $raw_response = H2PIAI_Product_Insight_Sanitizer::sanitize_wp_unslash($response['body']);  // Unslash before sanitization
+        $ai_response = H2PIAI_Product_Insight_Sanitizer::sanitize_ai_response($raw_response);
     
         if (!$ai_response || !isset($ai_response->success) || $ai_response->success !== true) {
             $error_message = isset($ai_response->message) ? 
@@ -341,7 +341,7 @@ class h2piai_Product_Insight_Main {
 
         $body = wp_json_encode($initial_data);
 
-        return wp_remote_post(esc_url_raw(h2piai_PRODUCT_INSIGHT_API_URL . '/query'), array(
+        return wp_remote_post(esc_url_raw(H2PIAI_PRODUCT_INSIGHT_API_URL . '/query'), array(
             'headers' => array(
                 'Content-Type'  => 'application/json',
                 'Authorization' => 'Bearer ' . $this->api_key
@@ -358,7 +358,7 @@ class h2piai_Product_Insight_Main {
             );
         }
 
-        $url = esc_url(h2piai_PRODUCT_INSIGHT_API_URL . '/query');
+        $url = esc_url(H2PIAI_PRODUCT_INSIGHT_API_URL . '/query');
         if (empty($url)) {
             return new WP_Error('invalid_url', 
                 esc_html__('Invalid API URL', 'h2-product-insight')
