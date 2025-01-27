@@ -39,7 +39,7 @@ class h2piai_Product_Insight_Settings {
     }
 
     public function enqueue_admin_scripts($hook) {
-        if ('settings_page_h2_product_insight' !== $hook) {
+        if ('settings_page_h2piai_product_insight' !== $hook) {
             return;
         }
         wp_enqueue_script('jquery');
@@ -65,7 +65,7 @@ class h2piai_Product_Insight_Settings {
      */
     public function enqueue_admin_styles($hook) {
         // Only enqueue on our settings page
-        if ('settings_page_h2_product_insight' !== $hook) {
+        if ('settings_page_h2piai_product_insight' !== $hook) {
             return;
         }
 
@@ -253,7 +253,7 @@ class h2piai_Product_Insight_Settings {
             
             <?php if (h2piai_ACTIVATION_TEST || empty($this->options['api_key'])) : ?>
                 <form id="h2piai_activate_product_insight" action="<?php echo esc_url(admin_url('admin-ajax.php')); ?>" method="post">
-                    <?php wp_nonce_field('h2piai_activate_product_insight_nonce', 'nonce'); ?>
+                    <?php wp_nonce_field('h2piai_activate_product_insight_nonce', '_wpnonce'); // Changed 'nonce' to '_wpnonce' ?>
                     <input type="hidden" name="action" value="h2piai_activate_product_insight" />
                     <button type="submit" class="button button-primary" id="h2_activate_button">
                         <?php echo esc_html__('Activate Product Insight AI', 'h2-product-insight'); ?>

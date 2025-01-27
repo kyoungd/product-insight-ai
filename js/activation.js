@@ -9,6 +9,7 @@
  * @file       js/activation.js
  */
 (function($) {
+    console.log('H2 Product Insight activation.js loaded');
 
     jQuery(document).ready(function($) {
         $('#h2piai_activate_product_insight').on('submit', function(e) {
@@ -26,16 +27,11 @@
             // Serialize form data to include nonce and action
             var formData = $form.serialize();
 
-            // Basic validation before sending
-            var apiKey = $form.find('input[name="api_key"]').val();
-            if (!apiKey || apiKey.length < 10) {
-                $message.text('Invalid API key format').addClass('notice-error').show();
-                return;
-            }
-
-            // Ensure nonce is present
-            if (!$form.find('input[name="_wpnonce"]').val()) {
-                $message.text('Security check failed').addClass('notice-error').show();
+            // Update nonce check
+            var nonce = $form.find('input[name="_wpnonce"]').val();
+            if (!nonce) {
+                console.error('Nonce field not found');
+                $message.text('Security check failed: nonce missing').addClass('notice-error').show();
                 return;
             }
 
@@ -44,7 +40,7 @@
                     $message.text(response.data.message).addClass('notice-success').show();
                     setTimeout(function() {
                         window.location.reload();
-                    }, 1500);
+                    }, 500);
                 } else {
                     $message.text('Error: ' + response.data.message).addClass('notice-error').show();
                     $button.prop('disabled', false);
