@@ -297,14 +297,14 @@ class h2piai_Product_Insight_Main {
 
         // Validate and sanitize data array if present
         $initial_data = array();
+        
         if (isset($_POST['data'])) {
+            // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Already sanitized below
             $raw_data = wp_unslash($_POST['data']);
-            if (!empty($raw_data)) {
-                $initial_data = h2piai_Product_Insight_Sanitizer::sanitize_ai_response($raw_data);
-                if (!$initial_data) {
-                    wp_send_json_error(esc_html__('Invalid data format', 'h2-product-insight'));
-                    return;
-                }
+            $initial_data = h2piai_Product_Insight_Sanitizer::sanitize_ai_response($raw_data);
+            if (!$initial_data) {
+                wp_send_json_error(esc_html__('Invalid data format', 'h2-product-insight'));
+                return;
             }
         }
 

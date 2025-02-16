@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
 }
 
 define('h2piai_ACTIVATION_TEST', false);
-define('h2piai_PRODUCT_INSIGHT_VERSION', '1.4');
+define('h2piai_PRODUCT_INSIGHT_VERSION', '1.5');
 define('h2piai_PRODUCT_INSIGHT_API_URL', 'https://2human.ai/wp-json/my-first-plugin/v1');
 # define('h2piai_PRODUCT_INSIGHT_API_URL', 'https://talkee.ai/wp-json/my-first-plugin/v1');
 

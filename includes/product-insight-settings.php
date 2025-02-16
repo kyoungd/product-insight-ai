@@ -82,11 +82,11 @@ class h2piai_Product_Insight_Settings {
      */
     public function add_admin_menu() {
         add_options_page(
-            esc_attr__('H2 Product Insight Settings', 'h2-product-insight'), 
-            esc_attr__('H2 Product Insight', 'h2-product-insight'),         
-            'manage_options',                                       
-            'h2piai_product_insight',                                   
-            array($this, 'render_settings_page')                   
+            esc_attr__('H2 Product Insight Settings', 'h2-product-insight'),
+            esc_attr__('H2 Product Insight', 'h2-product-insight'),
+            'manage_options',
+            'h2piai_product_insight',
+            array($this, 'render_settings_page')
         );
     }
 
@@ -94,7 +94,11 @@ class h2piai_Product_Insight_Settings {
      * Initializes the plugin settings.
      */
     public function init_settings() {
-        register_setting('h2_product_insight_settings', 'h2piai_product_insight_options', array($this, 'sanitize'));
+        register_setting(
+            'h2piai_product_insight_options_group', 
+            'h2piai_product_insight_options', 
+            'h2piai_product_insight_options_sanitize'
+        );
 
         add_settings_section(
             'h2_product_insight_general_section',
@@ -454,4 +458,12 @@ class h2piai_Product_Insight_Settings {
     }    
 
 
+}
+
+// Add the global helper sanitization function
+if ( ! function_exists( 'h2piai_product_insight_options_sanitize' ) ) {
+	function h2piai_product_insight_options_sanitize( $input ) {
+		$instance = new h2piai_Product_Insight_Settings();
+		return $instance->sanitize( $input );
+	}
 }
