@@ -12,8 +12,14 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-class h2piai_Product_Insight_Sanitizer {
+class TwoHumanAI_Product_Insight_Sanitizer {
 
+    /**
+     * Sanitizes custom CSS input.
+     *
+     * @param string $css The custom CSS string.
+     * @return string Sanitized CSS string.
+     */
     public static function sanitize_custom_css( $css ) {
         if ( empty( $css ) ) {
             return '';
@@ -36,8 +42,11 @@ class h2piai_Product_Insight_Sanitizer {
             return 'url("")';
         }, $css );
 
+        // Step 3.5: explicitly block more XSS patterns:
+        $css = preg_replace('/url\s*\(\s*[\'"]?(javascript|vbscript|data):[^)]+\)/i', 'url("")', $css);
+
         // Step 4: Limit the length
-        $css = substr( $css, 0, h2piai_PRODUCT_INSIGHT_MAX_QUERY_LENGTH );
+        $css = substr( $css, 0, TwoHumanAI_PRODUCT_INSIGHT_MAX_QUERY_LENGTH );
 
         // Step 5: Trim whitespace
         $css = trim( $css );
@@ -46,14 +55,23 @@ class h2piai_Product_Insight_Sanitizer {
     }
 
     /**
-     * Sanitizes AI response data.
+     * Sanitizes and validates the AI response data.
      *
-     * @param array $data The AI response data to sanitize.
-     * @return array Sanitized data.
+     * Accepts a JSON string or an already-decoded response.
+     *
+     * @param string|array $response_json The AI response data.
+     * @return object|null Sanitized response as an object, or null if invalid.
      */
-    public static function sanitize_ai_response($response_json) {
+    public static function sanitize_and_validate_ai_response($response_json) {
         // If already an array/object, don't decode
-        $response = is_string($response_json) ? json_decode($response_json, true) : $response_json;
+        if (is_string($response_json)) {
+            $response = json_decode($response_json, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                return null;
+            }
+        } else {
+            $response = $response_json;
+        }
         
         if (json_last_error() !== JSON_ERROR_NONE && is_string($response_json)) {
             return null;
@@ -67,7 +85,7 @@ class h2piai_Product_Insight_Sanitizer {
             'success' => (bool) $response['success']
         );
         
-        if (isset($response['data'])) {
+        if (isset($response['data']) && is_array($response['data'])) {
             $data = $response['data'];
             
             $sanitized['data'] = array(
@@ -85,9 +103,21 @@ class h2piai_Product_Insight_Sanitizer {
                 'product_description' => wp_kses_post($data['product_description'] ?? ''),
                 'product_title' => sanitize_text_field($data['product_title'] ?? '')
             );
+        } else {
+            $sanitized['data'] = array(); // Default to empty array if data is missing/invalid
         }
         
         return (object) $sanitized; // Convert to object to match expected format
+    }
+    
+    /**
+     * Sanitizes the given input using wp_unslash if safe.
+     *
+     * @param mixed $input The input data.
+     * @return mixed Unslashed input if safe; original input otherwise.
+     */
+    public static function sanitize_wp_unslash($input) {
+        return TwoHumanAI_Product_Insight_Sanitizer::should_wp_unslash($input) ? wp_unslash($input) : $input;
     }
     
     /**
@@ -131,9 +161,5 @@ class h2piai_Product_Insight_Sanitizer {
     
         // Otherwise, wp_unslash likely caused corruption
         return false;
-    }
-
-    public static function sanitize_wp_unslash($input) {
-        return h2piai_Product_Insight_Sanitizer::should_wp_unslash($input) ? wp_unslash($input) : $input;
     }
 }

@@ -12,12 +12,12 @@
     console.log('H2 Product Insight activation.js loaded');
 
     jQuery(document).ready(function($) {
-        $('#h2piai_activate_product_insight').on('submit', function(e) {
+        $('#TwoHumanAI_activate_product_insight').on('submit', function(e) {
             e.preventDefault();
 
             var $form = $(this);
             var $button = $form.find('#h2_activate_button');
-            var $message = $('#h2piai-activation-message');
+            var $message = $('#TwoHumanAI-activation-message');
             var $spinner = $button.find('.spinner');
             
             $button.prop('disabled', true);
@@ -34,7 +34,7 @@
             }
             formData += '&nonce=' + encodeURIComponent(nonce);
 
-            $.post(h2piai_product_insight.ajax_url, formData, function(response) {
+            $.post(TwoHumanAI_product_insight.ajax_url, formData, function(response) {
                 if (response.success) {
                     $message.text(response.data.message).addClass('notice-success').show();
                     setTimeout(function() {

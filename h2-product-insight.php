@@ -3,7 +3,7 @@
  * Plugin Name: H2 Product Insight
  * Plugin URI: https://2human.ai/product-insight/
  * Description: AI-powered Product Insight for WooCommerce products. Adds an intelligent chatbot that helps customers understand your products better.
- * Version: 1.5
+ * Version: 1.6
  * Requires at least: 5.0
  * Requires PHP: 7.2
  * Author: Young Kwon
@@ -40,17 +40,17 @@ require_once H2_PRODUCT_INSIGHT_PATH . 'includes/class-h2-product-insight.php';
 require_once H2_PRODUCT_INSIGHT_PATH . 'includes/class-h2-product-insight-sanitizer.php';
 
 // Initialize the plugin
-function h2piai_product_insight_initialization() {
+function TwoHumanAI_product_insight_initialization() {
     load_plugin_textdomain('h2-product-insight', false, dirname(plugin_basename(__FILE__)) . '/languages/');
-    new h2piai_Product_Insight_Main();
+    new TwoHumanAI_Product_Insight_Main();
 }
-add_action('plugins_loaded', 'h2piai_product_insight_initialization');
+add_action('plugins_loaded', 'TwoHumanAI_product_insight_initialization');
 
 // Add a "Settings" link to the plugin action links
-add_filter('plugin_action_links_' . plugin_basename(__FILE__), 'h2piai_product_insight_plugin_action_links');
+add_filter('plugin_action_links_' . plugin_basename(__FILE__), 'TwoHumanAI_product_insight_plugin_action_links');
 
-function h2piai_product_insight_plugin_action_links($links) {
-    $settings_url = admin_url('options-general.php?page=h2piai_product_insight');
+function TwoHumanAI_product_insight_plugin_action_links($links) {
+    $settings_url = admin_url('options-general.php?page=TwoHumanAI_product_insight');
     $settings_link = sprintf(
         '<a href="%s">%s</a>',
         esc_url($settings_url),

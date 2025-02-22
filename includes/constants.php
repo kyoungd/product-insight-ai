@@ -16,15 +16,16 @@ if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
 
-define('h2piai_ACTIVATION_TEST', false);
-define('h2piai_PRODUCT_INSIGHT_VERSION', '1.5');
-define('h2piai_PRODUCT_INSIGHT_API_URL', 'https://2human.ai/wp-json/my-first-plugin/v1');
-# define('h2piai_PRODUCT_INSIGHT_API_URL', 'https://talkee.ai/wp-json/my-first-plugin/v1');
+define('TwoHumanAI_ACTIVATION_TEST', false);
+define('TwoHumanAI_PRODUCT_INSIGHT_VERSION', '1.6');
+define('TwoHumanAI_PRODUCT_INSIGHT_API_URL', apply_filters('TwoHumanAI_product_insight_api_url', 'https://2human.ai/wp-json/my-first-plugin/v1'));
+# define('TwoHumanAI_PRODUCT_INSIGHT_API_URL', 'https://2human.ai/wp-json/my-first-plugin/v1');
+# define('TwoHumanAI_PRODUCT_INSIGHT_API_URL', 'https://talkee.ai/wp-json/my-first-plugin/v1');
 
-define('h2piai_PRODUCT_INSIGHT_MAX_MESSAGE_LENGTH', 1000);
-define('h2piai_PRODUCT_INSIGHT_MAX_QUERY_LENGTH', 2000);
+define('TwoHumanAI_PRODUCT_INSIGHT_MAX_MESSAGE_LENGTH', 1000);
+define('TwoHumanAI_PRODUCT_INSIGHT_MAX_QUERY_LENGTH', 2000);
 
-define('h2piai_PRODUCT_INSIGHT_SECURITY_PATTERNS', array(
+define('TwoHumanAI_PRODUCT_INSIGHT_SECURITY_PATTERNS', array(
     '/\\<script\\b[^>]*\\>.*?\\<\\/script\\>/is',  // Remove <script> tags (escaped)
     '/\\<iframe\\b[^>]*\\>.*?\\<\\/iframe\\>/is',  // Remove <iframe> tags (escaped)
     '/on\\w+\\s*=\\s*".*?"/is',                    // Remove inline event handlers in double quotes
@@ -32,7 +33,7 @@ define('h2piai_PRODUCT_INSIGHT_SECURITY_PATTERNS', array(
     '/on\\w+\\s*=\\s*\\w+/is',                     // Remove inline event handlers without quotes
 ));
 
-define('h2piai_PRODUCT_INSIGHT_INVALID_INPUTS', array(
+define('TwoHumanAI_PRODUCT_INSIGHT_INVALID_INPUTS', array(
     '/<\?php/i',                         // PHP tags
     '/<\?=/i',                           // Short open tags
     '/\<\%.+?\%\>/s',                    // ASP-style tags
@@ -41,7 +42,7 @@ define('h2piai_PRODUCT_INSIGHT_INVALID_INPUTS', array(
 ));
 
 
-define('h2piai_PRODUCT_INSIGHT_ALLOWED_HTML_TAGS', array(
+define('TwoHumanAI_PRODUCT_INSIGHT_ALLOWED_HTML_TAGS', array(
     // Text formatting
     'p'      => array(
         'class' => array(),
@@ -192,7 +193,7 @@ define('h2piai_PRODUCT_INSIGHT_ALLOWED_HTML_TAGS', array(
 
 
 // Strict tags for user inputs and sensitive contexts
-define('h2piai_PRODUCT_INSIGHT_ALLOWED_TAGS_STRICT', array(
+define('TwoHumanAI_PRODUCT_INSIGHT_ALLOWED_TAGS_STRICT', array(
     'p'      => array(),
     'br'     => array(),
     'strong' => array(),

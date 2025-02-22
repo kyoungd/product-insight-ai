@@ -3,7 +3,7 @@
 # This file is distributed under the GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: H2 Product Insight 1.5\n"
+"Project-Id-Version: H2 Product Insight 1.6\n"
 "POT-Creation-Date: 2024-04-27 12:00+0000\n"
 "PO-Revision-Date: 2024-12-15 13:30-0800\n"
 "Last-Translator: Young <kyoungd@hotmail.com>\n"

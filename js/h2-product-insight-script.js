@@ -12,147 +12,141 @@
 (function($) {
 
     jQuery(document).ready(function($) {
-        // // Check if we're on a product page
-        // if (!$('body').hasClass('single-product')) {
-        //     console.log('skip - no single product.')
-        //     return;
-        // }
+        const TwoHumanAI_lastReplyContainer = $('#TwoHumanAI-product-insight-ailast-reply-container');
+        const TwoHumanAI_inputContainer = $('#TwoHumanAI-product-insight-aiinput');
+        let TwoHumanAI_userInput = $('#TwoHumanAI-product-insight-aiuser-input');
+        let TwoHumanAI_initialResponse = null;
+        let TwoHumanAI_initialCallMade = false;
 
-        const h2piai_lastReplyContainer = $('#h2piai-product-insight-ailast-reply-container');
-        const h2piai_inputContainer = $('#h2piai-product-insight-aiinput');
-        let h2piai_userInput = $('#h2piai-product-insight-aiuser-input');
-        let h2piai_initialResponse = null;
-        let h2piai_initialCallMade = false;
-
-        function h2piai_addMessage(message, isAI = false) {
+        function TwoHumanAI_addMessage(message, isAI = false) {
             if (isAI) {
-                h2piai_lastReplyContainer.empty().append(
+                TwoHumanAI_lastReplyContainer.empty().append(
                     $('<div>', {
-                        'class': 'h2piai-ai-message',
+                        'class': 'TwoHumanAI-ai-message',
                         'text': message
                     })
                 ).show();
             }
         }
         
-        function h2piai_showProgressBar() {
-            console.log('h2piai_showProgressBar called');
-            h2piai_inputContainer.html('<div class="h2piai-progress-bar"><div class="h2piai-progress"></div></div>');
+        function TwoHumanAI_showProgressBar() {
+            console.log('TwoHumanAI_showProgressBar called');
+            TwoHumanAI_inputContainer.html('<div class="TwoHumanAI-progress-bar"><div class="TwoHumanAI-progress"></div></div>');
         }
 
-        function h2piai_hideProgressBar() {
-            console.log('h2piai_hideProgressBar called');
-            h2piai_inputContainer.html('<input type="text" id="h2piai-product-insight-aiuser-input" placeholder="Ask about the product...">');
-            h2piai_userInput = $('#h2piai-product-insight-aiuser-input'); // Reassign the h2piai_userInput variable
-            h2piai_attachInputListeners(); // Reattach event listeners
-            h2piai_userInput.focus(); // Add this line to maintain focus
+        function TwoHumanAI_hideProgressBar() {
+            console.log('TwoHumanAI_hideProgressBar called');
+            TwoHumanAI_inputContainer.html('<input type="text" id="TwoHumanAI-product-insight-aiuser-input" placeholder="Ask about the product...">');
+            TwoHumanAI_userInput = $('#TwoHumanAI-product-insight-aiuser-input'); // Reassign the TwoHumanAI_userInput variable
+            TwoHumanAI_attachInputListeners(); // Reattach event listeners
+            TwoHumanAI_userInput.focus(); // Add this line to maintain focus
         }
 
-        function h2piai_makeInitialCall() {
-            console.log('h2piai_makeInitialCall called');
-            h2piai_showProgressBar();
+        function TwoHumanAI_makeInitialCall() {
+            console.log('TwoHumanAI_makeInitialCall called');
+            TwoHumanAI_showProgressBar();
             $.ajax({
-                url: h2_product_insight_ajax.ajax_url,
+                url: TwoHumanAI_product_insight_ajax.ajax_url,
                 type: 'POST',
                 data: {
-                    action: 'h2piai_product_insight_initial_call',
-                    nonce: h2_product_insight_ajax.nonce,  // Add this line
-                    subscription_external_id: h2_product_insight_ajax.api_key,
+                    action: 'TwoHumanAI_product_insight_initial_call',
+                    nonce: TwoHumanAI_product_insight_ajax.nonce,
+                    subscription_external_id: TwoHumanAI_product_insight_ajax.api_key,
                     timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-                    product_id: h2_product_insight_ajax.product_id,
-                    caller_domain: window.location.hostname // Add this line
+                    product_id: TwoHumanAI_product_insight_ajax.product_id,
+                    caller_domain: window.location.hostname
                 },
                 success: function(response) {
-                    h2piai_hideProgressBar();
+                    TwoHumanAI_hideProgressBar();
                     if (response.success) {
-                        h2piai_initialResponse = response.data.data;
-                        console.log('Initial call successful:', h2piai_initialResponse);
-                        h2piai_initialCallMade = true;
+                        TwoHumanAI_initialResponse = response.data.data;
+                        console.log('Initial call successful:', TwoHumanAI_initialResponse);
+                        TwoHumanAI_initialCallMade = true;
                     } else {
                         console.error('Initial call failed:', response.data);
-                        h2piai_addMessage('Error initializing chat. Please try again later.', true);
+                        TwoHumanAI_addMessage('Error initializing chat. Please try again later.', true);
                     }
                 },
                 error: function(xhr, status, error) {
-                    h2piai_hideProgressBar();
+                    TwoHumanAI_hideProgressBar();
                     console.error('Error making initial call:', error);
-                    h2piai_addMessage('Error initializing chat. Please try again later.', true);
+                    TwoHumanAI_addMessage('Error initializing chat. Please try again later.', true);
                 }
             });
         }
 
-        function h2piai_sendMessage() {
-            const message = h2piai_userInput.val().trim();
+        function TwoHumanAI_sendMessage() {
+            const message = TwoHumanAI_userInput.val().trim();
             if (message === '') return;
 
-            h2piai_userInput.val('');
-            h2piai_showProgressBar();
+            TwoHumanAI_userInput.val('');
+            TwoHumanAI_showProgressBar();
 
-            if (h2piai_initialResponse === null) {
-                h2piai_addMessage('Please wait, initializing chat...', true);
+            if (TwoHumanAI_initialResponse === null) {
+                TwoHumanAI_addMessage('Please wait, initializing chat...', true);
                 let checkInitialResponse = setInterval(function() {
-                    if (h2piai_initialResponse !== null) {
+                    if (TwoHumanAI_initialResponse !== null) {
                         clearInterval(checkInitialResponse);
-                        h2piai_proceedWithMessage(message);
+                        TwoHumanAI_proceedWithMessage(message);
                     }
                 }, 100);
             } else {
-                h2piai_proceedWithMessage(message);
+                TwoHumanAI_proceedWithMessage(message);
             }
         }
 
-        function h2piai_proceedWithMessage(message) {
-            // Basic client-side sanitization
-            message = message.replace(/[<>]/g, '').trim().substring(0, 1000);
+        function TwoHumanAI_proceedWithMessage(message) {
+            // Enhanced client-side sanitization
+            message = message.replace(/[<>]|javascript:|vbscript:|data:/gi, '').trim().substring(0, 1000);
             
             // Add data validation before sending
-            if (!message || !h2_product_insight_ajax.nonce) {
-                h2piai_addMessage('Invalid input data', true);
+            if (!message || !TwoHumanAI_product_insight_ajax.nonce) {
+                TwoHumanAI_addMessage('Invalid input data', true);
                 return;
             }
 
             $.ajax({
-                url: h2_product_insight_ajax.ajax_url,
+                url: TwoHumanAI_product_insight_ajax.ajax_url,
                 type: 'POST',
                 data: {
-                    action: 'h2piai_send_product_insight_message',
-                    nonce: h2_product_insight_ajax.nonce,
+                    action: 'TwoHumanAI_send_product_insight_message',
+                    nonce: TwoHumanAI_product_insight_ajax.nonce,
                     message: message,
-                    data: h2piai_initialResponse
+                    data: TwoHumanAI_initialResponse
                 },
                 success: function(response) {
-                    h2piai_hideProgressBar();
+                    TwoHumanAI_hideProgressBar();
                     if (response.success) {
-                        h2piai_initialResponse = response.data.data;
-                        h2piai_addMessage(h2piai_initialResponse.message, true);
+                        TwoHumanAI_initialResponse = response.data.data;
+                        TwoHumanAI_addMessage(TwoHumanAI_initialResponse.message, true);
                     } else {
-                        h2piai_addMessage('Error: ' + response.data, true);
+                        TwoHumanAI_addMessage('Error: ' + response.data, true);
                     }
                 },
                 error: function() {
-                    h2piai_hideProgressBar();
-                    h2piai_addMessage('Error communicating with the server', true);
+                    TwoHumanAI_hideProgressBar();
+                    TwoHumanAI_addMessage('Error communicating with the server', true);
                 }
             });
         }
 
-        function h2piai_attachInputListeners() {
-            console.log('h2piai_attachInputListeners called');
-            h2piai_userInput.on('keypress', function(e) {
+        function TwoHumanAI_attachInputListeners() {
+            console.log('TwoHumanAI_attachInputListeners called');
+            TwoHumanAI_userInput.on('keypress', function(e) {
                 if (e.which === 13) {
-                    h2piai_sendMessage();
+                    TwoHumanAI_sendMessage();
                 }
             });
 
-            h2piai_userInput.one('focus', function() {
-                if (!h2piai_initialCallMade) {
+            TwoHumanAI_userInput.one('focus', function() {
+                if (!TwoHumanAI_initialCallMade) {
                     console.log('Input field focused. Making initial AI call.');
-                    h2piai_makeInitialCall();
+                    TwoHumanAI_makeInitialCall();
                 }
             });
         }
 
-        h2piai_hideProgressBar();
+        TwoHumanAI_hideProgressBar();
     });
 
 })(jQuery);

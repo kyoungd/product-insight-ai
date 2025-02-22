@@ -23,34 +23,32 @@ require_once H2_PRODUCT_INSIGHT_PATH . 'includes/class-h2-product-insight-saniti
 /**
  * Main plugin class
  *
- * @package    h2piai_Product_Insight_Main
+ * @package    TwoHumanAI_Product_Insight_Main
  * @subpackage Classes
  * @since      1.0.0
  */
-class h2piai_Product_Insight_Main {
+class TwoHumanAI_Product_Insight_Main {
 
     private $settings;
     private $api_key;
     private $product_id; // Add this line to store product ID
-    // New property to avoid duplicate script enqueues
-    private $scripts_enqueued = false;
 
     public function __construct() {
         // Settings class initialization
-        $this->settings = new h2piai_Product_Insight_Settings();
+        $this->settings = new TwoHumanAI_Product_Insight_Settings();
         add_action('init', array($this, 'init'));
 
         // AJAX action hooks
-        add_action('wp_ajax_h2piai_send_product_insight_message', array($this, 'h2piai_send_product_insight_message'));
-        add_action('wp_ajax_nopriv_h2piai_send_product_insight_message', array($this, 'h2piai_send_product_insight_message'));
-        add_action('wp_ajax_h2piai_product_insight_initial_call', array($this, 'h2piai_handle_initial_call'));
-        add_action('wp_ajax_nopriv_h2piai_product_insight_initial_call', array($this, 'h2piai_handle_initial_call'));
+        add_action('wp_ajax_TwoHumanAI_send_product_insight_message', array($this, 'TwoHumanAI_send_product_insight_message'));
+        add_action('wp_ajax_nopriv_TwoHumanAI_send_product_insight_message', array($this, 'TwoHumanAI_send_product_insight_message'));
+        add_action('wp_ajax_TwoHumanAI_product_insight_initial_call', array($this, 'TwoHumanAI_handle_initial_call'));
+        add_action('wp_ajax_nopriv_TwoHumanAI_product_insight_initial_call', array($this, 'TwoHumanAI_handle_initial_call'));
 
         // Hook to display the chatbox
         add_action('init', array($this, 'add_chatbox_display_hook'));
 
         // Add shortcode registration
-        add_shortcode('h2piai_product_insight', array($this, 'handle_shortcode'));
+        add_shortcode('TwoHumanAI_product_insight', array($this, 'handle_shortcode'));
 
         // Enqueue scripts and styles
         add_action('wp_enqueue_scripts', array($this, 'enqueue_scripts'));
@@ -71,46 +69,56 @@ class h2piai_Product_Insight_Main {
     }
 
     public function init() {
-        $options = get_option('h2piai_product_insight_options', array()); // Added default array value
+        $options = get_option('TwoHumanAI_product_insight_options', array()); // Added default array value
         $this->api_key = isset($options['api_key']) ? sanitize_text_field($options['api_key']) : '';
     }
 
     public function enqueue_scripts() {
-        if ( $this->scripts_enqueued ) {
-            return;
-        }
-        // Enqueue the CSS and JS scripts
-        wp_enqueue_style(
-            'product-insight-style',
+        // Register the style
+        wp_register_style(
+            'h2-product-insight-style',
             plugin_dir_url(__FILE__) . '../css/product-insight-style.css',
-            array(),
-            h2piai_PRODUCT_INSIGHT_VERSION  // Updated to use constant
+            array(), // No dependencies
+            TwoHumanAI_PRODUCT_INSIGHT_VERSION
         );
-        wp_enqueue_script(
+
+        // Register the script with defer attribute (WordPress 6.3+)
+        wp_register_script(
             'h2-product-insight-script',
             plugin_dir_url(__FILE__) . '../js/h2-product-insight-script.js',
-            array('jquery'),
-            h2piai_PRODUCT_INSIGHT_VERSION,  // Updated to use constant
-            true
+            array('jquery'), // Dependency on jQuery
+            TwoHumanAI_PRODUCT_INSIGHT_VERSION,
+            array(
+                'in_footer' => true, // Load in footer
+                'strategy'  => 'defer' // Add defer attribute (WP 6.3+)
+            )
         );
-        wp_localize_script('h2-product-insight-script', 'h2_product_insight_ajax', array(
+
+        // Localize script data
+        wp_localize_script('h2-product-insight-script', 'TwoHumanAI_product_insight_ajax', array(
             'ajax_url'   => esc_url(admin_url('admin-ajax.php')),
             'api_key'    => esc_attr($this->api_key),
             'product_id' => absint($this->product_id ?: get_the_ID()),
-            'nonce'      => wp_create_nonce('h2_product_insight_nonce') // Add this line
+            'nonce'      => wp_create_nonce('TwoHumanAI_product_insight_nonce')
         ));
 
-        // Add custom CSS if it exists
-        $options = get_option('h2piai_product_insight_options', array());
-        if (!empty($options['custom_css'])) {
-            $custom_css = h2piai_Product_Insight_Sanitizer::sanitize_custom_css($options['custom_css']);
-            wp_add_inline_style('product-insight-style', $custom_css);
+        // Enqueue only on product pages or when shortcode is used
+        if (is_product() || $this->product_id) {
+            wp_enqueue_style('h2-product-insight-style');
+            wp_enqueue_script('h2-product-insight-script');
+
+            // Add inline CSS if available
+            $options = get_option('TwoHumanAI_product_insight_options', array());
+            if (!empty($options['custom_css'])) {
+                $custom_css = TwoHumanAI_Product_Insight_Sanitizer::sanitize_custom_css($options['custom_css']);
+                $custom_css = wp_strip_all_tags($custom_css); // Additional safety
+                // Note: Sanitization ensures CSS safety; no native esc_css() exists in WordPress
+                wp_add_inline_style('h2-product-insight-style', $custom_css);            }
         }
-        $this->scripts_enqueued = true;
     }
 
     public function add_chatbox_display_hook() {
-        $options   = get_option('h2piai_product_insight_options');
+        $options   = get_option('TwoHumanAI_product_insight_options');
         $placement = isset($options['chatbox_placement']) ? $options['chatbox_placement'] : 'after_add_to_cart';
 
         switch ($placement) {
@@ -155,42 +163,32 @@ class h2piai_Product_Insight_Main {
     }
 
     public function render_chatbox() {
-        // Ensure product_id is set
         if (!$this->product_id && is_product()) {
             $this->product_id = get_the_ID();
         }
-        
-        // Ensure scripts are loaded before rendering
-        if (!wp_script_is('h2-product-insight-script', 'enqueued')) {
-            $this->enqueue_scripts();
-        }
-        
-        return h2piai_Product_Insight_Renderer::render();
+        return TwoHumanAI_Product_Insight_Renderer::render();
     }
 
-    public function h2piai_handle_initial_call() {
-        // Verify nonce first
-        if (!check_ajax_referer('h2_product_insight_nonce', 'nonce', false)) {
-            wp_send_json_error(esc_html__('Security check failed.', 'h2-product-insight'));
-            return;
+    public function TwoHumanAI_handle_initial_call() {
+        if (!wp_verify_nonce($_POST['nonce'], 'TwoHumanAI_product_insight_nonce')) {
+            wp_send_json_error(__('Security check failed.', 'h2-product-insight'));
+            wp_die(); // Use wp_die() after wp_send_json_* for AJAX
         }
 
-        // Validate required fields exist
         if (!isset($_POST['subscription_external_id'], $_POST['timeZone'])) {
-            wp_send_json_error(esc_html__('Required fields are missing', 'h2-product-insight'));
+            wp_send_json_error(__('Required fields are missing.', 'h2-product-insight'));
             return;
         }
 
-        // Sanitize and validate inputs
         $subscription_id = sanitize_text_field(wp_unslash($_POST['subscription_external_id']));
         if (empty($subscription_id)) {
-            wp_send_json_error(esc_html__('Invalid subscription ID', 'h2-product-insight'));
+            wp_send_json_error(__('Invalid subscription ID.', 'h2-product-insight'));
             return;
         }
 
         $timezone = sanitize_text_field(wp_unslash($_POST['timeZone']));
         if (!in_array($timezone, timezone_identifiers_list(), true)) {
-            wp_send_json_error(esc_html__('Invalid timezone', 'h2-product-insight'));
+            wp_send_json_error(__('Invalid timezone.', 'h2-product-insight'));
             return;
         }
 
@@ -198,17 +196,16 @@ class h2piai_Product_Insight_Main {
         if (isset($_POST['caller_domain'])) {
             $caller_domain = sanitize_text_field(wp_unslash($_POST['caller_domain']));
             if (empty($caller_domain)) {
-                wp_send_json_error(esc_html__('Invalid domain', 'h2-product-insight'));
+                wp_send_json_error(__('Invalid domain.', 'h2-product-insight'));
                 return;
             }
 
-            // Ensure the domain starts with http:// or https://
             if (strpos($caller_domain, 'http://') !== 0 && strpos($caller_domain, 'https://') !== 0) {
                 $caller_domain = 'https://' . $caller_domain;
             }            
 
             if (!wp_http_validate_url($caller_domain)) {
-                wp_send_json_error(esc_html__('Invalid domain', 'h2-product-insight'));
+                wp_send_json_error(__('Invalid domain.', 'h2-product-insight'));
                 return;
             }
         }
@@ -217,12 +214,11 @@ class h2piai_Product_Insight_Main {
         if (isset($_POST['product_id'])) {
             $product_id = absint(wp_unslash($_POST['product_id']));
             if ($product_id > 0 && !wc_get_product($product_id)) {
-                wp_send_json_error(esc_html__('Invalid product ID', 'h2-product-insight'));
+                wp_send_json_error(__('Invalid product ID.', 'h2-product-insight'));
                 return;
             }
         }
 
-        // 5. Create data array with sanitized values
         $initial_data = array(
             'subscription_external_id' => $subscription_id,
             'timeZone'                => $timezone,
@@ -230,12 +226,11 @@ class h2piai_Product_Insight_Main {
             'caller_domain'           => $caller_domain
         );
     
-        // Product data handling
         $product_description = '';
         $product_title = '';
-        if ($product_id > 0) {  // Additional validation
+        if ($product_id > 0) {
             $product = wc_get_product($product_id);
-            if ($product && $product instanceof WC_Product) {  // Type checking
+            if ($product && $product instanceof WC_Product) {
                 $product_title = sanitize_text_field($this->get_product_title($product));
                 $product_description = wp_kses_post($this->get_product_full_description($product));
             }
@@ -244,26 +239,24 @@ class h2piai_Product_Insight_Main {
         $response = $this->call_ai_api_initial($initial_data);
     
         if (is_wp_error($response)) {
-            wp_send_json_error(esc_html($response->get_error_message()));
+            wp_send_json_error(__($response->get_error_message(), 'h2-product-insight'));
             return;
         }
     
-        $raw_data = h2piai_Product_Insight_Sanitizer::sanitize_wp_unslash($response['body']);  // Unslash before sanitization
-        $ai_response = h2piai_Product_Insight_Sanitizer::sanitize_ai_response($raw_data);
+        $raw_data = TwoHumanAI_Product_Insight_Sanitizer::sanitize_wp_unslash($response['body']);
+        $ai_response = TwoHumanAI_Product_Insight_Sanitizer::sanitize_and_validate_ai_response($raw_data);
         if (!$ai_response || !isset($ai_response->success) || $ai_response->success !== true) {
             $error_message = isset($ai_response->message) ? 
-                esc_html($ai_response->message) : 
-                esc_html__('Unknown error occurred', 'h2-product-insight');
+                esc_html__($ai_response->message, 'h2-product-insight') : 
+                esc_html__('Unknown error occurred.', 'h2-product-insight');
             wp_send_json_error($error_message);
             return;
         }
     
-        // Ensure data object exists and sanitize final output
         if (!isset($ai_response->data)) {
             $ai_response->data = new stdClass();
         }
     
-        // Safely assign the properties with sanitized values
         $ai_response->data = (object) array_merge(
             (array) $ai_response->data,
             array(
@@ -275,86 +268,110 @@ class h2piai_Product_Insight_Main {
         wp_send_json_success($ai_response);
     }
 
-    public function h2piai_send_product_insight_message() {
-        // Verify nonce first
-        if (!check_ajax_referer('h2_product_insight_nonce', 'nonce', false)) {
-            wp_send_json_error(esc_html__('Security check failed.', 'h2-product-insight'));
+    public function TwoHumanAI_send_product_insight_message() {
+        // Verify nonce for security
+        if (!check_ajax_referer('TwoHumanAI_product_insight_nonce', 'nonce', false)) {
+            wp_send_json_error(__('Security check failed. Please try again.', 'h2-product-insight'));
             return;
         }
-
-        // Validate message exists
+    
+        // Check for required message field
         if (!isset($_POST['message'])) {
-            wp_send_json_error(esc_html__('Message is required', 'h2-product-insight'));
+            wp_send_json_error(__('Message field is missing. Please provide a message.', 'h2-product-insight'));
             return;
         }
-
-        // Sanitize and validate message
+    
+        // Sanitize and validate message early
         $user_message = sanitize_text_field(wp_unslash($_POST['message']));
         if (empty($user_message)) {
-            wp_send_json_error(esc_html__('Message cannot be empty', 'h2-product-insight'));
+            wp_send_json_error(__('Message cannot be empty. Please enter a valid message.', 'h2-product-insight'));
             return;
         }
-
-        // Validate message length
-        if (strlen($user_message) > h2piai_PRODUCT_INSIGHT_MAX_MESSAGE_LENGTH) {
-            wp_send_json_error(esc_html__('Message is too long', 'h2-product-insight'));
+    
+        if (strlen($user_message) > TwoHumanAI_PRODUCT_INSIGHT_MAX_MESSAGE_LENGTH) {
+            wp_send_json_error(sprintf(
+                esc_html__('Message exceeds maximum length of %d characters.', 'h2-product-insight'),
+                TwoHumanAI_PRODUCT_INSIGHT_MAX_MESSAGE_LENGTH
+            ));
             return;
         }
-
-        // Validate and sanitize data array if present
+    
         $initial_data = array();
-        
         if (isset($_POST['data'])) {
-            // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Already sanitized below
             $raw_data = wp_unslash($_POST['data']);
-            $initial_data = h2piai_Product_Insight_Sanitizer::sanitize_ai_response($raw_data);
+    
+            // #1: Stronger Validation - Explicitly check data type and structure
+            if (!is_string($raw_data) && !is_array($raw_data)) {
+                wp_send_json_error(__('Invalid data type received. Expected string or array.', 'h2-product-insight'));
+                return;
+            }
+    
+            // #2: Sanitization Clarity - Rename and document the method for clarity
+            // Note: Assuming TwoHumanAI_Product_Insight_Sanitizer::sanitize_and_validate_ai_response exists or is renamed
+            $initial_data = TwoHumanAI_Product_Insight_Sanitizer::sanitize_and_validate_ai_response($raw_data);
             if (!$initial_data) {
-                wp_send_json_error(esc_html__('Invalid data format', 'h2-product-insight'));
+                // #3: Error Specificity - Provide detailed error messages
+                if (is_string($raw_data) && json_decode($raw_data, true) === null) {
+                    wp_send_json_error(__('Invalid JSON format in data. Please check the input.', 'h2-product-insight'));
+                } else {
+                    wp_send_json_error(__('AI response data is invalid or incomplete.', 'h2-product-insight'));
+                }
                 return;
             }
         }
-
-        // 5. Make API call with sanitized data
+    
+        // Proceed with API call using sanitized and validated data
         $response = $this->call_ai_api($user_message, $initial_data);
     
         if (is_wp_error($response)) {
-            wp_send_json_error(esc_html($response->get_error_message()));
+            wp_send_json_error(__($response->get_error_message(), 'h2-product-insight'));
             return;
         }
     
-        // 6. Sanitize API response
-        $raw_response = h2piai_Product_Insight_Sanitizer::sanitize_wp_unslash($response['body']);  // Unslash before sanitization
-        $ai_response = h2piai_Product_Insight_Sanitizer::sanitize_ai_response($raw_response);
+        $raw_response = TwoHumanAI_Product_Insight_Sanitizer::sanitize_wp_unslash($response['body']);
+        $ai_response = TwoHumanAI_Product_Insight_Sanitizer::sanitize_and_validate_ai_response($raw_response);
     
         if (!$ai_response || !isset($ai_response->success) || $ai_response->success !== true) {
             $error_message = isset($ai_response->message) ? 
-                esc_html($ai_response->message) : 
-                esc_html__('Unknown error occurred', 'h2-product-insight');
+                esc_html__($ai_response->message, 'h2-product-insight') : 
+                esc_html__('Unknown error occurred while processing the AI response.', 'h2-product-insight');
             wp_send_json_error($error_message);
             return;
         }
     
         wp_send_json_success($ai_response);
     }
-    
+        
     private function call_ai_api_initial($initial_data) {
         if (empty($this->api_key)) {
-            return new WP_Error(
-                'api_error', 
-                esc_html__('API Key is not set. Please configure the plugin settings.', 'h2-product-insight')
-            );
+            return new WP_Error('api_error', __('API Key is not set. Please configure the plugin settings.', 'h2-product-insight'));
         }
-
-        $body = wp_json_encode($initial_data);
-
-        return wp_remote_post(esc_url_raw(h2piai_PRODUCT_INSIGHT_API_URL . '/query'), array(
+    
+        $response = wp_remote_post(esc_url_raw(TwoHumanAI_PRODUCT_INSIGHT_API_URL . '/query'), array(
             'headers' => array(
                 'Content-Type'  => 'application/json',
                 'Authorization' => 'Bearer ' . $this->api_key
             ),
-            'body'    => $body,
+            'body'    => wp_json_encode($initial_data),
             'timeout' => 15
         ));
+    
+        if (is_wp_error($response)) {
+            return $response;
+        }
+    
+        $response_code = wp_remote_retrieve_response_code($response);
+        $response_body = wp_remote_retrieve_body($response);
+    
+        if ($response_code !== 200) {
+            return new WP_Error('api_error', sprintf(__('API request failed with status %d.', 'h2-product-insight'), $response_code));
+        }
+    
+        if (empty($response_body)) {
+            return new WP_Error('api_error', __('Empty response from API.', 'h2-product-insight'));
+        }
+    
+        return $response;
     }
 
     private function call_ai_api($message, $initial_data) {
@@ -364,10 +381,10 @@ class h2piai_Product_Insight_Main {
             );
         }
 
-        $url = esc_url(h2piai_PRODUCT_INSIGHT_API_URL . '/query');
+        $url = esc_url(TwoHumanAI_PRODUCT_INSIGHT_API_URL . '/query');
         if (empty($url)) {
             return new WP_Error('invalid_url', 
-                esc_html__('Invalid API URL', 'h2-product-insight')
+                esc_html__('Invalid API URL.', 'h2-product-insight')
             );
         }
 
@@ -379,7 +396,7 @@ class h2piai_Product_Insight_Main {
         $response = wp_remote_post(esc_url($url), array(
             'headers' => array(
                 'Content-Type'  => 'application/json',
-                'Authorization' => 'Bearer ' . $this->api_key // Changed
+                'Authorization' => 'Bearer ' . $this->api_key
             ),
             'body'    => wp_json_encode($sanitized_data),
             'timeout' => 15
@@ -403,9 +420,9 @@ class h2piai_Product_Insight_Main {
 
     private function get_product_reviews($product_id) {
         $args    = array(
-            'post_id' => absint($product_id), // Added absint
+            'post_id' => absint($product_id),
             'status'  => 'approve',
-            'number'  => min(50, absint(apply_filters('h2_product_insight_max_reviews', 50))), // Added limit
+            'number'  => min(50, absint(apply_filters('TwoHumanAI_product_insight_max_reviews', 50))),
             'orderby' => 'date',
             'order'   => 'DESC',
         );

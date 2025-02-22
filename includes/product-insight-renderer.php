@@ -18,7 +18,7 @@ if (!defined('ABSPATH')) {
 
 require_once plugin_dir_path(__FILE__) . './class-h2-product-insight-sanitizer.php';
 
-class h2piai_Product_Insight_Renderer {
+class TwoHumanAI_Product_Insight_Renderer {
 
     /**
      * Renders the chatbox based on the custom or default template.
@@ -44,21 +44,22 @@ class h2piai_Product_Insight_Renderer {
      */
     private static function render_default_template() {
         ob_start();
+        // Note: Content populated by JS is escaped via jQuery .text() to prevent XSS.
         ?>
-        <div id="h2piai-product-insight-aichatbox">
-            <div id="h2piai-product-insight-aiinput">
+        <div id="TwoHumanAI-product-insight-aichatbox">
+            <div id="TwoHumanAI-product-insight-aiinput">
                 <input type="text" 
-                       id="h2piai-product-insight-aiuser-input" 
+                       id="TwoHumanAI-product-insight-aiuser-input" 
                        placeholder="<?php echo esc_attr__('Ask about the product...', 'h2-product-insight'); ?>" 
                        aria-label="<?php echo esc_attr__('Chat Input', 'h2-product-insight'); ?>"
                        maxlength="1000"
                        pattern="[^<>]*"
                 >
-                <div id="h2piai-product-insight-ailoading" style="display: none;">
+                <div id="TwoHumanAI-product-insight-ailoading" style="display: none;">
                     <?php echo esc_html__('Initializing...', 'h2-product-insight'); ?>
                 </div>
             </div>
-            <div id="h2piai-product-insight-ailast-reply-container" style="display: none;"></div>
+            <div id="TwoHumanAI-product-insight-ailast-reply-container" style="display: none;"></div>
             <div id="product-insight-aimessages"></div>
         </div>
         <?php
