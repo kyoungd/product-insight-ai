@@ -15,10 +15,10 @@ if (!defined('ABSPATH')) {
 }
 
 // Include only the necessary files
-require_once plugin_dir_path(__FILE__) . './constants.php';
-require_once plugin_dir_path(__FILE__) . './product-insight-settings.php';
-require_once plugin_dir_path(__FILE__) . './product-insight-renderer.php';
-require_once plugin_dir_path(__FILE__) . './class-h2-product-insight-sanitizer.php';
+require_once H2_PRODUCT_INSIGHT_PATH . 'includes/constants.php';
+require_once H2_PRODUCT_INSIGHT_PATH . 'includes/product-insight-settings.php';
+require_once H2_PRODUCT_INSIGHT_PATH . 'includes/product-insight-renderer.php';
+require_once H2_PRODUCT_INSIGHT_PATH . 'includes/class-h2-product-insight-sanitizer.php';
 
 /**
  * Main plugin class
@@ -32,6 +32,8 @@ class h2piai_Product_Insight_Main {
     private $settings;
     private $api_key;
     private $product_id; // Add this line to store product ID
+    // New property to avoid duplicate script enqueues
+    private $scripts_enqueued = false;
 
     public function __construct() {
         // Settings class initialization
@@ -74,6 +76,9 @@ class h2piai_Product_Insight_Main {
     }
 
     public function enqueue_scripts() {
+        if ( $this->scripts_enqueued ) {
+            return;
+        }
         // Enqueue the CSS and JS scripts
         wp_enqueue_style(
             'product-insight-style',
@@ -101,6 +106,7 @@ class h2piai_Product_Insight_Main {
             $custom_css = h2piai_Product_Insight_Sanitizer::sanitize_custom_css($options['custom_css']);
             wp_add_inline_style('product-insight-style', $custom_css);
         }
+        $this->scripts_enqueued = true;
     }
 
     public function add_chatbox_display_hook() {

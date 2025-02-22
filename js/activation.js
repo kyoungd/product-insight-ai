@@ -24,16 +24,15 @@
             $spinner.css('visibility', 'visible'); // WordPress spinners use visibility
             $message.attr('class', 'notice').hide().text('');
 
-            // Serialize form data to include nonce and action
+            // Serialize form data and append nonce with key "nonce"
             var formData = $form.serialize();
-
-            // Update nonce check
             var nonce = $form.find('input[name="_wpnonce"]').val();
             if (!nonce) {
                 console.error('Nonce field not found');
                 $message.text('Security check failed: nonce missing').addClass('notice-error').show();
                 return;
             }
+            formData += '&nonce=' + encodeURIComponent(nonce);
 
             $.post(h2piai_product_insight.ajax_url, formData, function(response) {
                 if (response.success) {

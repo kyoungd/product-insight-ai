@@ -23,7 +23,12 @@ if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
 
-require_once plugin_dir_path(__FILE__) . 'includes/constants.php';
+// Define constant for the plugin's base path
+if (!defined('H2_PRODUCT_INSIGHT_PATH')) {
+    define('H2_PRODUCT_INSIGHT_PATH', plugin_dir_path(__FILE__));
+}
+
+require_once H2_PRODUCT_INSIGHT_PATH . 'includes/constants.php';
 
 // Check if WooCommerce is active
 if (!in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_option('active_plugins')))) {
@@ -31,8 +36,8 @@ if (!in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
 }
 
 // Include the main plugin class
-require_once plugin_dir_path(__FILE__) . 'includes/class-h2-product-insight.php';
-require_once plugin_dir_path(__FILE__) . 'includes/class-h2-product-insight-sanitizer.php';
+require_once H2_PRODUCT_INSIGHT_PATH . 'includes/class-h2-product-insight.php';
+require_once H2_PRODUCT_INSIGHT_PATH . 'includes/class-h2-product-insight-sanitizer.php';
 
 // Initialize the plugin
 function h2piai_product_insight_initialization() {
