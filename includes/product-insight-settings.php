@@ -447,7 +447,6 @@ class TwoHumanAI_Product_Insight_Settings {
 
         // Add new option
         $update_success = update_option('TwoHumanAI_product_insight_options', $options, false);
-        error_log('------------------ Update success: ' . var_export($update_success, true)); // Debug]
 
         if ($update_success && !empty($options['api_key'])) {
             wp_send_json_success(array(
