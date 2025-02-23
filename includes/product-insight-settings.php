@@ -17,6 +17,108 @@ if (!defined('ABSPATH')) {
 require_once plugin_dir_path(__FILE__) . './constants.php';
 require_once plugin_dir_path(__FILE__) . './class-h2-product-insight-sanitizer.php';
 
+/**
+ * Sanitizes the settings input.
+ *
+ * @param array $input The input settings array.
+ * @return array Sanitized settings.
+ */
+function TwoHumanAI_Product_Insight_Settings_sanitize($input) {
+    if (!is_array($input)) {
+        return array();
+    }
+
+    $sanitized_input = array();
+    $invalid_fields = array(); 
+    $existing_options = get_option('TwoHumanAI_product_insight_options', array());
+
+    // Sanitize API Key
+    if (isset($input['api_key']) && !empty($input['api_key'])) {
+        $sanitized_input['api_key'] = sanitize_text_field($input['api_key']);
+    } else {
+        $invalid_fields[] = 'api_key';
+        add_settings_error(
+            'TwoHumanAI_product_insight_options_group',
+            'invalid_api_key',
+            esc_html__('API Key is required. Previous key retained.', 'h2-product-insight'),
+            'error'
+        );
+        $sanitized_input['api_key'] = $existing_options['api_key'] ?? '';
+    }
+
+    // If any required fields are missing, retain existing values and stop validation
+    if (!empty($invalid_fields)) {
+        update_option('TwoHumanAI_product_insight_invalid_fields', $invalid_fields);
+        return array_merge($existing_options, $sanitized_input);
+    }
+
+    // Validate API key with the external API
+    $response = wp_remote_post(TwoHumanAI_PRODUCT_INSIGHT_API_URL . '/validate-api-key', array(
+        'headers' => array('Content-Type' => 'application/json'),
+        'body'    => wp_json_encode(array('api_key' => $sanitized_input['api_key'])),
+        'timeout' => 15,
+    ));
+
+    if (is_wp_error($response)) {
+        $invalid_fields = array_merge($invalid_fields, array('api_key'));
+        add_settings_error(
+            'TwoHumanAI_product_insight_options_group',
+            'api_request_failed',
+            sprintf(
+                /* translators: %s: error message from HTTP REST API request */
+                esc_html__('API validation request failed: %s. Previous values retained.', 'h2-product-insight'),
+                esc_html($response->get_error_message())
+            ),
+            'error'
+        );
+        $sanitized_input['api_key'] = $existing_options['api_key'];
+    } else {
+        $response_code = wp_remote_retrieve_response_code($response);
+        $response_body = wp_remote_retrieve_body($response);
+        $result = json_decode($response_body, true);
+
+        if ($response_code !== 200 || empty($result['success'])) {
+            $invalid_fields = array_merge($invalid_fields, array('api_key'));
+            $message = !empty($result['message']) 
+                ? sanitize_text_field($result['message'])
+                : esc_html__('API validation failed. Previous values retained.', 'h2-product-insight');
+            add_settings_error(
+                'TwoHumanAI_product_insight_options_group',
+                'api_validation_failed',
+                $message,
+                'error'
+            );
+            $sanitized_input['api_key'] = $existing_options['api_key'];
+        } else {
+            add_settings_error(
+                'TwoHumanAI_product_insight_options_group',
+                'api_validation_success',
+                esc_html__('API connection validated successfully.', 'h2-product-insight'),
+                'success'
+            );
+        }
+    }
+
+    // Sanitize optional fields
+    if (isset($input['custom_css'])) {
+        $sanitized_input['custom_css'] = TwoHumanAI_Product_Insight_Sanitizer::sanitize_custom_css($input['custom_css']);
+    } else {
+        $sanitized_input['custom_css'] = $existing_options['custom_css'] ?? '';
+    }
+
+    if (isset($input['chatbox_placement'])) {
+        $sanitized_input['chatbox_placement'] = sanitize_text_field($input['chatbox_placement']);
+    } else {
+        $sanitized_input['chatbox_placement'] = $existing_options['chatbox_placement'] ?? 'after_add_to_cart';
+    }
+
+    // Update invalid fields option for styling
+    update_option('TwoHumanAI_product_insight_invalid_fields', $invalid_fields);
+
+    return array_merge($existing_options, $sanitized_input);
+}
+
+
 class TwoHumanAI_Product_Insight_Settings {
     private $options;
     private $invalid_fields = array();
@@ -118,7 +220,7 @@ class TwoHumanAI_Product_Insight_Settings {
         register_setting(
             'TwoHumanAI_product_insight_options_group', 
             'TwoHumanAI_product_insight_options', 
-            array($this, 'sanitize') // Reference the class method directly
+            'TwoHumanAI_Product_Insight_Settings_sanitize'  // Reference the class method directly
         );
 
         add_settings_section(
@@ -154,106 +256,6 @@ class TwoHumanAI_Product_Insight_Settings {
             'TwoHumanAI_product_insight',
             'TwoHumanAI_product_insight_general_section'
         );
-    }
-
-    /**
-     * Sanitizes the settings input.
-     *
-     * @param array $input The input settings array.
-     * @return array Sanitized settings.
-     */
-    public function sanitize($input) {
-        if (!is_array($input)) {
-            return array();
-        }
-
-        $sanitized_input = array();
-        $this->invalid_fields = array(); 
-        $existing_options = get_option('TwoHumanAI_product_insight_options', array());
-
-        // Sanitize API Key
-        if (isset($input['api_key']) && !empty($input['api_key'])) {
-            $sanitized_input['api_key'] = sanitize_text_field($input['api_key']);
-        } else {
-            $this->invalid_fields[] = 'api_key';
-            add_settings_error(
-                'TwoHumanAI_product_insight_options_group',
-                'invalid_api_key',
-                esc_html__('API Key is required. Previous key retained.', 'h2-product-insight'),
-                'error'
-            );
-            $sanitized_input['api_key'] = $existing_options['api_key'] ?? '';
-        }
-
-        // If any required fields are missing, retain existing values and stop validation
-        if (!empty($this->invalid_fields)) {
-            update_option('TwoHumanAI_product_insight_invalid_fields', $this->invalid_fields);
-            return array_merge($existing_options, $sanitized_input);
-        }
-
-        // Validate API key with the external API
-        $response = wp_remote_post(TwoHumanAI_PRODUCT_INSIGHT_API_URL . '/validate-api-key', array(
-            'headers' => array('Content-Type' => 'application/json'),
-            'body'    => wp_json_encode(array('api_key' => $sanitized_input['api_key'])),
-            'timeout' => 15,
-        ));
-
-        if (is_wp_error($response)) {
-            $this->invalid_fields = array_merge($this->invalid_fields, array('api_key'));
-            add_settings_error(
-                'TwoHumanAI_product_insight_options_group',
-                'api_request_failed',
-                sprintf(
-                    esc_html__('API validation request failed: %s. Previous values retained.', 'h2-product-insight'),
-                    esc_html($response->get_error_message())
-                ),
-                'error'
-            );
-            $sanitized_input['api_key'] = $existing_options['api_key'];
-        } else {
-            $response_code = wp_remote_retrieve_response_code($response);
-            $response_body = wp_remote_retrieve_body($response);
-            $result = json_decode($response_body, true);
-
-            if ($response_code !== 200 || empty($result['success'])) {
-                $this->invalid_fields = array_merge($this->invalid_fields, array('api_key'));
-                $message = !empty($result['message']) 
-                    ? sanitize_text_field($result['message'])
-                    : esc_html__('API validation failed. Previous values retained.', 'h2-product-insight');
-                add_settings_error(
-                    'TwoHumanAI_product_insight_options_group',
-                    'api_validation_failed',
-                    $message,
-                    'error'
-                );
-                $sanitized_input['api_key'] = $existing_options['api_key'];
-            } else {
-                add_settings_error(
-                    'TwoHumanAI_product_insight_options_group',
-                    'api_validation_success',
-                    esc_html__('API connection validated successfully.', 'h2-product-insight'),
-                    'success'
-                );
-            }
-        }
-
-        // Sanitize optional fields
-        if (isset($input['custom_css'])) {
-            $sanitized_input['custom_css'] = TwoHumanAI_Product_Insight_Sanitizer::sanitize_custom_css($input['custom_css']);
-        } else {
-            $sanitized_input['custom_css'] = $existing_options['custom_css'] ?? '';
-        }
-
-        if (isset($input['chatbox_placement'])) {
-            $sanitized_input['chatbox_placement'] = sanitize_text_field($input['chatbox_placement']);
-        } else {
-            $sanitized_input['chatbox_placement'] = $existing_options['chatbox_placement'] ?? 'after_add_to_cart';
-        }
-
-        // Update invalid fields option for styling
-        update_option('TwoHumanAI_product_insight_invalid_fields', $this->invalid_fields);
-
-        return array_merge($existing_options, $sanitized_input);
     }
 
     /**
@@ -312,8 +314,8 @@ class TwoHumanAI_Product_Insight_Settings {
      * @return void
      */
     public function render_api_key_field() {
-        $value = isset($this->options['api_key']) ? esc_attr($this->options['api_key']) : '';
-        echo '<input type="text" name="TwoHumanAI_product_insight_options[api_key]" value="' . $value . '" class="regular-text" />';
+        $value = isset($this->options['api_key']) ? $this->options['api_key'] : '';
+        echo '<input type="text" name="TwoHumanAI_product_insight_options[api_key]" value="' . esc_attr($value) . '" class="regular-text" />';
     }
 
     /**
@@ -346,8 +348,8 @@ class TwoHumanAI_Product_Insight_Settings {
      * @return void
      */
     public function render_custom_css_field() {
-        $value = isset($this->options['custom_css']) ? esc_textarea($this->options['custom_css']) : '';
-        echo '<textarea name="TwoHumanAI_product_insight_options[custom_css]" rows="5" cols="50" class="large-text">' . $value . '</textarea>';
+        $value = isset($this->options['custom_css']) ? $this->options['custom_css'] : '';
+        echo '<textarea name="' . esc_attr('TwoHumanAI_product_insight_options[custom_css]') . '" rows="5" cols="50" class="large-text">' . esc_textarea($value) . '</textarea>';
     }
 
     /**
@@ -356,6 +358,7 @@ class TwoHumanAI_Product_Insight_Settings {
      * @return void JSON response on success or error.
      */
     public function handle_activate_product_insight() {
+        ob_clean(); // Clear any output before sending JSON
         check_ajax_referer('TwoHumanAI_activate_product_insight_nonce', 'nonce');
 
         if (!current_user_can('manage_options')) {
@@ -393,6 +396,7 @@ class TwoHumanAI_Product_Insight_Settings {
                 'TwoHumanAI_product_insight_options_group',
                 'activation_request_failed',
                 sprintf(
+                    /* translators: %s: error message from HTTP REST API request */
                     esc_html__('API activation request failed: %s.', 'h2-product-insight'),
                     esc_html($response->get_error_message())
                 ),
@@ -443,6 +447,7 @@ class TwoHumanAI_Product_Insight_Settings {
 
         // Add new option
         $update_success = update_option('TwoHumanAI_product_insight_options', $options, false);
+        error_log('------------------ Update success: ' . var_export($update_success, true)); // Debug]
 
         if ($update_success && !empty($options['api_key'])) {
             wp_send_json_success(array(
@@ -459,3 +464,4 @@ class TwoHumanAI_Product_Insight_Settings {
         }
     }
 }
+

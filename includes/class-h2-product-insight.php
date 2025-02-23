@@ -170,9 +170,11 @@ class TwoHumanAI_Product_Insight_Main {
     }
 
     public function TwoHumanAI_handle_initial_call() {
-        if (!wp_verify_nonce($_POST['nonce'], 'TwoHumanAI_product_insight_nonce')) {
+        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+        $nonce = isset($_POST['nonce']) ? wp_unslash($_POST['nonce']) : '';
+        if (!wp_verify_nonce($nonce, 'TwoHumanAI_product_insight_nonce')) {
             wp_send_json_error(__('Security check failed.', 'h2-product-insight'));
-            wp_die(); // Use wp_die() after wp_send_json_* for AJAX
+            wp_die();
         }
 
         if (!isset($_POST['subscription_external_id'], $_POST['timeZone'])) {
@@ -239,7 +241,7 @@ class TwoHumanAI_Product_Insight_Main {
         $response = $this->call_ai_api_initial($initial_data);
     
         if (is_wp_error($response)) {
-            wp_send_json_error(__($response->get_error_message(), 'h2-product-insight'));
+            wp_send_json_error(esc_html($response->get_error_message()));
             return;
         }
     
@@ -247,7 +249,7 @@ class TwoHumanAI_Product_Insight_Main {
         $ai_response = TwoHumanAI_Product_Insight_Sanitizer::sanitize_and_validate_ai_response($raw_data);
         if (!$ai_response || !isset($ai_response->success) || $ai_response->success !== true) {
             $error_message = isset($ai_response->message) ? 
-                esc_html__($ai_response->message, 'h2-product-insight') : 
+                esc_html($ai_response->message) : 
                 esc_html__('Unknown error occurred.', 'h2-product-insight');
             wp_send_json_error($error_message);
             return;
@@ -268,80 +270,108 @@ class TwoHumanAI_Product_Insight_Main {
         wp_send_json_success($ai_response);
     }
 
+    /**
+     * Recursively sanitizes an array by applying sanitize_text_field to each non-array value.
+     *
+     * @param array $array The input array to sanitize.
+     * @return array The sanitized array.
+     */
+    private function recursive_sanitize_array($array) {
+        foreach ($array as $key => &$value) {
+            if (is_array($value)) {
+                $value = $this->recursive_sanitize_array($value);
+            } else {
+                $value = sanitize_text_field($value);
+            }
+        }
+        return $array;
+    }
+
+    /**
+     * Handles the AJAX request to send a product insight message to an AI API.
+     */
     public function TwoHumanAI_send_product_insight_message() {
         // Verify nonce for security
         if (!check_ajax_referer('TwoHumanAI_product_insight_nonce', 'nonce', false)) {
             wp_send_json_error(__('Security check failed. Please try again.', 'h2-product-insight'));
             return;
         }
-    
+
         // Check for required message field
         if (!isset($_POST['message'])) {
             wp_send_json_error(__('Message field is missing. Please provide a message.', 'h2-product-insight'));
             return;
         }
-    
+
         // Sanitize and validate message early
         $user_message = sanitize_text_field(wp_unslash($_POST['message']));
         if (empty($user_message)) {
             wp_send_json_error(__('Message cannot be empty. Please enter a valid message.', 'h2-product-insight'));
             return;
         }
-    
+
+        // Validate message length
         if (strlen($user_message) > TwoHumanAI_PRODUCT_INSIGHT_MAX_MESSAGE_LENGTH) {
             wp_send_json_error(sprintf(
+                /* translators: 1: Maximum length of message string defined by a constant. */
                 esc_html__('Message exceeds maximum length of %d characters.', 'h2-product-insight'),
                 TwoHumanAI_PRODUCT_INSIGHT_MAX_MESSAGE_LENGTH
             ));
             return;
         }
-    
+
+        // Initialize default data
         $initial_data = array();
         if (isset($_POST['data'])) {
+            // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitization handled immediately below
             $raw_data = wp_unslash($_POST['data']);
-    
-            // #1: Stronger Validation - Explicitly check data type and structure
-            if (!is_string($raw_data) && !is_array($raw_data)) {
+            if (is_string($raw_data)) {
+                // Handle JSON string
+                $sanitized_string = sanitize_text_field($raw_data);
+                $decoded_data = json_decode($sanitized_string, true);
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    wp_send_json_error(__('Invalid JSON format in data. Please check the input.', 'h2-product-insight'));
+                    return;
+                }
+                $data = $decoded_data;
+            } elseif (is_array($raw_data)) {
+                // Handle array
+                $data = $this->recursive_sanitize_array($raw_data);
+            } else {
                 wp_send_json_error(__('Invalid data type received. Expected string or array.', 'h2-product-insight'));
                 return;
             }
-    
-            // #2: Sanitization Clarity - Rename and document the method for clarity
-            // Note: Assuming TwoHumanAI_Product_Insight_Sanitizer::sanitize_and_validate_ai_response exists or is renamed
-            $initial_data = TwoHumanAI_Product_Insight_Sanitizer::sanitize_and_validate_ai_response($raw_data);
+            // Pass sanitized data to custom sanitizer
+            $initial_data = TwoHumanAI_Product_Insight_Sanitizer::sanitize_and_validate_ai_response($data);
             if (!$initial_data) {
-                // #3: Error Specificity - Provide detailed error messages
-                if (is_string($raw_data) && json_decode($raw_data, true) === null) {
-                    wp_send_json_error(__('Invalid JSON format in data. Please check the input.', 'h2-product-insight'));
-                } else {
-                    wp_send_json_error(__('AI response data is invalid or incomplete.', 'h2-product-insight'));
-                }
+                wp_send_json_error(__('AI response data is invalid or incomplete.', 'h2-product-insight'));
                 return;
             }
         }
-    
-        // Proceed with API call using sanitized and validated data
+
+        // Call AI API with sanitized data
         $response = $this->call_ai_api($user_message, $initial_data);
-    
+
+        // Handle API response
         if (is_wp_error($response)) {
-            wp_send_json_error(__($response->get_error_message(), 'h2-product-insight'));
+            wp_send_json_error($response->get_error_message());
             return;
         }
-    
+
         $raw_response = TwoHumanAI_Product_Insight_Sanitizer::sanitize_wp_unslash($response['body']);
         $ai_response = TwoHumanAI_Product_Insight_Sanitizer::sanitize_and_validate_ai_response($raw_response);
-    
+
         if (!$ai_response || !isset($ai_response->success) || $ai_response->success !== true) {
-            $error_message = isset($ai_response->message) ? 
-                esc_html__($ai_response->message, 'h2-product-insight') : 
+            $error_message = isset($ai_response->message) ?
+                esc_html($ai_response->message) :
                 esc_html__('Unknown error occurred while processing the AI response.', 'h2-product-insight');
             wp_send_json_error($error_message);
             return;
         }
-    
+
         wp_send_json_success($ai_response);
     }
-        
+
     private function call_ai_api_initial($initial_data) {
         if (empty($this->api_key)) {
             return new WP_Error('api_error', __('API Key is not set. Please configure the plugin settings.', 'h2-product-insight'));
@@ -364,6 +394,7 @@ class TwoHumanAI_Product_Insight_Main {
         $response_body = wp_remote_retrieve_body($response);
     
         if ($response_code !== 200) {
+            /* translators: 1: REST API HTTP status code. */
             return new WP_Error('api_error', sprintf(__('API request failed with status %d.', 'h2-product-insight'), $response_code));
         }
     

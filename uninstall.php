@@ -16,11 +16,8 @@ if (!defined('WP_UNINSTALL_PLUGIN')) {
     exit;
 }
 
-// // Delete plugin options
-// delete_option('TwoHumanAI_product_insight_options');
-// delete_option('TwoHumanAI_product_insight_invalid_fields');
-// Delete transients or other plugin-specific data if used
-global $wpdb;
-$wpdb->query("DELETE FROM $wpdb->options WHERE option_name LIKE 'TwoHumanAI_%'");
+// Delete plugin options
+delete_option('TwoHumanAI_product_insight_options');
+delete_option('TwoHumanAI_product_insight_invalid_fields');
 
 // Clean up any additional options and custom tables if necessary
